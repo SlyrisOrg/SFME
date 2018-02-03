@@ -1,0 +1,3 @@
+[submodule "vendor/core-v2"]
+	path = vendor/core-v2
+	url = ssh://git.slyris.eu:29418/core-v2
