@@ -15,7 +15,7 @@ namespace sfme::mediator::details
     struct BaseEventCallbackWrapper
     {
         virtual ~BaseEventCallbackWrapper() noexcept = default;
-        virtual void operator()(const sfme::mediator::InsideEvents *event) const noexcept = 0;
+        virtual void operator()(const sfme::mediator::BaseEvent *event) const noexcept = 0;
     };
 
     template <typename TEvent>
@@ -26,7 +26,7 @@ namespace sfme::mediator::details
         {
         }
 
-        void operator()(const sfme::mediator::InsideEvents *event) const noexcept final
+        void operator()(const sfme::mediator::BaseEvent *event) const noexcept final
         {
             _callback(*(static_cast<const TEvent *>(event)));
         }

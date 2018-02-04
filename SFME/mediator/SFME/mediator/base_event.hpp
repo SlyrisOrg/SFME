@@ -9,7 +9,7 @@
 
 namespace sfme::mediator
 {
-    struct InsideEvents
+    struct BaseEvent
     {
     protected:
         void showEvents(std::string_view str) const noexcept
@@ -17,6 +17,6 @@ namespace sfme::mediator
             _log(logging::Debug) << "Events " << str << " triggered." << std::endl;
         }
 
-        logging::Logger _log{"InsideEvents", logging::Debug};
+        logging::Logger _log{"BaseEvent", logging::Debug};
     };
 }

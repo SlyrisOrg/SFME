@@ -8,7 +8,7 @@
 
 namespace sfme::testing
 {
-    struct FooEvents : sfme::mediator::InsideEvents
+    struct FooEvents : sfme::mediator::BaseEvent
     {
         FooEvents() noexcept
         {
@@ -24,7 +24,7 @@ namespace sfme::testing
         std::string str{"Good"};
     };
 
-    struct BarEvents : sfme::mediator::InsideEvents
+    struct BarEvents : sfme::mediator::BaseEvent
     {
         BarEvents() noexcept
         {

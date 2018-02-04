@@ -49,9 +49,9 @@ TEST(Mediator, EmitToMultipleSubscriber)
 
 TEST(Mediator, TypeTraits)
 {
-    static_assert(std::is_base_of_v<sfme::mediator::InsideEvents, sfme::testing::FooEvents>, "must be true");
-    static_assert(std::is_base_of_v<sfme::mediator::InsideEvents, sfme::testing::BarEvents>, "must be true");
-    static_assert(!std::is_base_of_v<sfme::mediator::InsideEvents, sfme::testing::Foo>, "must be false");
+    static_assert(std::is_base_of_v<sfme::mediator::BaseEvent, sfme::testing::FooEvents>, "must be true");
+    static_assert(std::is_base_of_v<sfme::mediator::BaseEvent, sfme::testing::BarEvents>, "must be true");
+    static_assert(!std::is_base_of_v<sfme::mediator::BaseEvent, sfme::testing::Foo>, "must be false");
 }
 
 TEST(Mediator, AllEvents)
