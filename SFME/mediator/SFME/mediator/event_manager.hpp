@@ -16,9 +16,10 @@ namespace sfme::mediator
     class EventManager
     {
     public:
-        template <typename TEvent, typename TReceiver, typename Enable = details::is_mediator_event<TEvent>>
+        template <typename TEvent, typename TReceiver>
         void subscribe(TReceiver &receiver) noexcept
         {
+            static_assert(details::is_mediator_event<TEvent>, "The template parameter must be base of InsideEvents");
             const details::EventTypeID familyId = details::getTypeId<TEvent>();
             BaseReceiver &base = receiver;
             auto pair = std::make_pair(&base,
@@ -29,9 +30,10 @@ namespace sfme::mediator
             _receivers[familyId].emplace_back(std::move(pair));
         };
 
-        template <typename TEvent, typename ... Args, typename Enable = details::is_mediator_event<TEvent>>
+        template <typename TEvent, typename ... Args>
         void emit(Args &&... args) noexcept
         {
+            static_assert(details::is_mediator_event<TEvent>, "The template parameter must be base of InsideEvents");
             TEvent event(std::forward<Args>(args)...);
             const details::EventTypeID familyId = details::getTypeId<TEvent>();
 

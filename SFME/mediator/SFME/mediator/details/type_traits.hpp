@@ -10,7 +10,7 @@
 namespace sfme::mediator::details
 {
     template<typename T>
-    using is_mediator_event = std::enable_if_t<std::is_base_of_v<InsideEvents, T>>;
+    constexpr bool is_mediator_event = std::is_base_of_v<InsideEvents, T>;
 }
 
 #endif //SFME_TYPE_TRAITS_HPP

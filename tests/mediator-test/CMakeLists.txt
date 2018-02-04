@@ -1,4 +1,4 @@
-set(SOURCES mediator-test.cpp)
+set(SOURCES mediator-test.cpp events.hpp receivers.hpp)
 CREATE_UNIT_TEST(mediator-test SFME: "${SOURCES}")
 target_link_libraries(mediator-test SFME::Mediator)
 if (GCC)
