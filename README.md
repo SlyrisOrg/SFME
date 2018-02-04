@@ -9,7 +9,7 @@ build with SFML and love
 
  - [Description](#description)
  - [Installation](#install)
-
+ - [Documentation](#doc)
 
 
 ## Description<a name="description"></a>
@@ -24,3 +24,9 @@ Therefore, you can use the whole engine or only one module, it just depends on y
 
 ```git clone git@github.com:Milerius/SFME.git```
  
+
+## Documentation<a name="doc"></a>
+
+See repository's wiki for more info
+
+[SFME's wiki](https://github.com/Milerius/SFME/wiki)
