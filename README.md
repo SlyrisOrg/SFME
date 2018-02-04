@@ -8,7 +8,7 @@ build with SFML and love
 ## Table of contents
 
  - [Description](#description)
-
+ - [Installation](#install)
 
 
 
@@ -17,3 +17,10 @@ build with SFML and love
 SFME (Simple and Fast Multimedia Engine) is an engine divided into several modules which not necessarily depend on each other
  
 Therefore, you can use the whole engine or only one module, it just depends on your needs
+
+
+
+## Installation<a name="install"></a>
+
+```git clone git@github.com:Milerius/SFME.git```
+ 
