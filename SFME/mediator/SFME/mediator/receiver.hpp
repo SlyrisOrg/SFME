@@ -2,8 +2,7 @@
 // Created by milerius on 03/02/18.
 //
 
-#ifndef SFME_MEDIATOR_RECEIVER_HPP
-#define SFME_MEDIATOR_RECEIVER_HPP
+#pragma once
 
 #include <core/utils/NonCopyable.hpp>
 
@@ -19,4 +18,3 @@ namespace sfme::mediator
     };
 }
 
-#endif //SFME_MEDIATOR_RECEIVER_HPP

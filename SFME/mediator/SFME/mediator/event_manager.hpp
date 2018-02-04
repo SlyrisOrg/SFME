@@ -7,6 +7,7 @@
 #include <memory>
 #include <unordered_map>
 #include <SFME/mediator/receiver.hpp>
+#include <SFME/mediator/details/type_traits.hpp>
 #include <SFME/mediator/details/event_callback_wrapper.hpp>
 #include <SFME/mediator/details/type_id.hpp>
 
@@ -15,36 +16,35 @@ namespace sfme::mediator
     class EventManager
     {
     public:
-        template <typename TEvent, typename TReceiver>
+        template <typename TEvent, typename TReceiver, typename Enable = details::is_mediator_event<TEvent>>
         void subscribe(TReceiver &receiver) noexcept
         {
             const details::EventTypeID familyId = details::getTypeId<TEvent>();
             BaseReceiver &base = receiver;
             auto pair = std::make_pair(&base,
                                        std::make_shared<details::EventCallbackWrapper<TEvent>>(
-                                           [&receiver](const auto &ev) {
+                                           [&receiver](const auto &ev) noexcept {
                                                receiver.receive(ev);
                                            }));
             _receivers[familyId].emplace_back(std::move(pair));
         };
 
-        template <typename TEvent, typename ... Args>
+        template <typename TEvent, typename ... Args, typename Enable = details::is_mediator_event<TEvent>>
         void emit(Args &&... args) noexcept
         {
             TEvent event(std::forward<Args>(args)...);
             const details::EventTypeID familyId = details::getTypeId<TEvent>();
 
-            std::for_each(begin(_receivers[familyId]), end(_receivers[familyId]), [&event](const auto &pr) {
+            std::for_each(begin(_receivers[familyId]), end(_receivers[familyId]), [&event](const auto &pr) noexcept {
                 //! Otherwise MSVC ambiguous call...
                 pr.second->operator()(&event);
             });
         };
 
-
-        bool isRegister(BaseReceiver& receiver) const noexcept
+        bool isRegister(BaseReceiver &receiver) const noexcept
         {
             for (auto &&receivers : _receivers) {
-                for (auto&& vec: receivers.second) {
+                for (auto &&vec: receivers.second) {
                     if (vec.first == &receiver)
                         return true;
                 }

@@ -13,7 +13,8 @@ set(MODULE_PUBLIC_HEADERS
 
 set(MODULE_PRIVATE_HEADERS
         "${MODULE_PATH}/details/event_callback_wrapper.hpp"
-        "${MODULE_PATH}/details/type_id.hpp")
+        "${MODULE_PATH}/details/type_id.hpp"
+        "${MODULE_PATH}/details/type_traits.hpp")
 
 set(MODULE_SOURCES
         ${MODULE_PUBLIC_HEADERS}

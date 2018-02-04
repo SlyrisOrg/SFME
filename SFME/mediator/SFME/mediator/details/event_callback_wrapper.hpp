@@ -14,19 +14,19 @@ namespace sfme::mediator::details
      */
     struct BaseEventCallbackWrapper
     {
-        virtual ~BaseEventCallbackWrapper() = default;
-        virtual void operator()(const sfme::mediator::InsideEvents *event) const = 0;
+        virtual ~BaseEventCallbackWrapper() noexcept = default;
+        virtual void operator()(const sfme::mediator::InsideEvents *event) const noexcept = 0;
     };
 
     template <typename TEvent>
-    class EventCallbackWrapper : public BaseEventCallbackWrapper
+    class EventCallbackWrapper final : public BaseEventCallbackWrapper
     {
     public:
-        explicit EventCallbackWrapper(const std::function<void(const TEvent &)> &callback) : _callback(callback)
+        explicit EventCallbackWrapper(const std::function<void(const TEvent &)> &callback) noexcept : _callback(callback)
         {
         }
 
-        void operator()(const sfme::mediator::InsideEvents *event) const override
+        void operator()(const sfme::mediator::InsideEvents *event) const noexcept final
         {
             _callback(*(static_cast<const TEvent *>(event)));
         }
