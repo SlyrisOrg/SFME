@@ -1,0 +1,5 @@
+include(CMakeSources.cmake)
+add_executable(sfme_mediator_subscribe_example ${SFME_MEDIATOR_EXAMPLE_SUBSCRIBE_SOURCES})
+add_executable(sfme_mediator_emit_example ${SFME_MEDIATOR_EXAMPLE_EMIT_SOURCES})
+target_link_libraries(sfme_mediator_subscribe_example SFME::Mediator)
+target_link_libraries(sfme_mediator_emit_example SFME::Mediator)

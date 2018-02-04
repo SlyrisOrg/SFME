@@ -1,0 +1,2 @@
+set(SFME_MEDIATOR_EXAMPLE_SUBSCRIBE_SOURCES mediator_subscribe.cpp)
+set(SFME_MEDIATOR_EXAMPLE_EMIT_SOURCES mediator_emit.cpp)
