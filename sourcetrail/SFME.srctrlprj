@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <config>
     <source_groups>
-        <source_group_49eb6453-5a18-40b4-a4a9-a22c6ba1294f>
+        <source_group_ec6a969a-1a64-4666-936e-e7d9ec8f80b6>
             <build_file_path>
                 <compilation_db_path>../g++-Debug-build/compile_commands.json</compilation_db_path>
             </build_file_path>
+            <exclude_paths>
+                <exclude_path>../example/base</exclude_path>
+                <exclude_path>../tests</exclude_path>
+                <exclude_path>../example/mediator/mediator_subscribe.cpp</exclude_path>
+            </exclude_paths>
             <name>C/C++ from Compilation Database</name>
             <source_paths>
-                <source_path>../example/base</source_path>
-                <source_path>../example/mediator</source_path>
-                <source_path>../tests/mediator-test</source_path>
                 <source_path>../SFME</source_path>
                 <source_path>../vendor/core-v2/core</source_path>
             </source_paths>
             <status>enabled</status>
             <type>C/C++ from Compilation Database</type>
-        </source_group_49eb6453-5a18-40b4-a4a9-a22c6ba1294f>
+        </source_group_ec6a969a-1a64-4666-936e-e7d9ec8f80b6>
     </source_groups>
     <version>4</version>
 </config>
