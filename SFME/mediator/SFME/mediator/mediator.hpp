@@ -8,4 +8,3 @@
 #include <SFME/mediator/base_event.hpp>
 #include <SFME/mediator/receiver.hpp>
 #include <SFME/mediator/event_manager.hpp>
-#include <SFME/mediator/details/type_traits.hpp>
