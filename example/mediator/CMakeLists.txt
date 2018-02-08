@@ -4,8 +4,10 @@ add_executable(sfme_mediator_subscribe_example ${SFME_MEDIATOR_EXAMPLE_SUBSCRIBE
 add_executable(sfme_mediator_emit_example ${SFME_MEDIATOR_EXAMPLE_EMIT_SOURCES})
 add_executable(sfme_mediator_showevents_example ${SFME_MEDIATOR_EXAMPLE_SHOWEVENTS_SOURCES})
 add_executable(sfme_mediator_receiver_example ${SFME_MEDIATOR_EXAMPLE_RECEIVER_SOURCES})
+add_executable(sfme_mediator_full_example ${SFME_MEDIATOR_EXAMPLE_FULL_SOURCES})
 
 target_link_libraries(sfme_mediator_subscribe_example SFME::Mediator)
 target_link_libraries(sfme_mediator_emit_example SFME::Mediator)
 target_link_libraries(sfme_mediator_showevents_example SFME::Mediator)
 target_link_libraries(sfme_mediator_receiver_example SFME::Mediator)
+target_link_libraries(sfme_mediator_full_example SFME::Mediator)
