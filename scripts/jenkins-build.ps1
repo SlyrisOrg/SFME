@@ -53,7 +53,7 @@ function run_xunit($type)
     run_xunit_impl $type
     #cd ..
     #run_xunit_impl
-    #cd ..
+    cd ..
 }
 
 function run_ctest($type)
