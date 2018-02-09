@@ -49,11 +49,11 @@ function run_xunit_impl($type)
 function run_xunit($type)
 {
     cd ..
-    cd bin/$type
+    cd bin
     run_xunit_impl $type
-    cd ..
-    run_xunit_impl
-    cd ..
+    #cd ..
+    #run_xunit_impl
+    #cd ..
 }
 
 function run_ctest($type)
@@ -69,7 +69,7 @@ function publish_result($type)
     cd test-result
     mkdir ctest
     cd ..
-    cp bin/$type/*.xml test-result/
+    #cp bin/$type/*.xml test-result/
     cp bin/*.xml test-result/
     cp build-$type/Testing/*/*.xml test-result/ctest
 }
