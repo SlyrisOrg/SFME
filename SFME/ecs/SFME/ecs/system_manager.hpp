@@ -15,7 +15,8 @@ namespace sfme::ecs
     class SystemManager : public sfme::mediator::Receiver<SystemManager>
     {
     public:
-        SystemManager(sfme::mediator::EventManager &evtMgr)
+        //! Constructor
+        SystemManager(sfme::mediator::EventManager &evtMgr) noexcept
         {
             evtMgr.subscribe<sfme::mediator::evt::GameStarted>(*this);
         }
