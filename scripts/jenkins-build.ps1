@@ -11,11 +11,11 @@ function print_settings($compiler,$type)
 
 function remove_old_build($oldtarget, $type)
 {
-    Remove-Item ./build-$type -Force -Recurse
-    Remove-Item ./test-result -Force -Recurse
-    Remove-Item ./bin/$type -Force -Recurse
-    Remove-Item ./bin/*.dll -Force
-    Remove-Item ./bin/$oldtarget -Force
+    Remove-Item ./build-$type -Force -Recurse 2>&1 | out-null
+    Remove-Item ./test-result -Force -Recurse 2>&1 | out-null
+    Remove-Item ./bin/$type -Force -Recurse 2>&1 | out-null
+    Remove-Item ./bin/*.dll -Force 2>&1 | out-null
+    Remove-Item ./bin/$oldtarget -Force 2>&1 | out-null
 }
 
 function build($type)
@@ -23,8 +23,18 @@ function build($type)
     mkdir build-$type
     cd build-$type
     $cmd = "-DCMAKE_BUILD_TYPE=$type"
-    cmake -DCMAKE_TOOLCHAIN_FILE=C:/Users/root/Desktop/vcpkg/scripts/buildsystems/vcpkg.cmake $cmd -DSFME_BUILD_TESTS=ON -DSFME_BUILD_EXAMPLES=ON -G "Visual Studio 15 2017 Win64" ..
-    cmake --build . --config $type -- /verbosity:minimal /m
+    $localpath = Join-Path $env:VCPKG_ROOT '/scripts/buildsystems/vcpkg.cmake'
+    $localpath = $localpath -replace "\\", "/"
+    cmake -DCMAKE_TOOLCHAIN_FILE="$localpath" $cmd -DSFME_BUILD_TESTS=ON -DSFME_BUILD_EXAMPLES=ON -G "Visual Studio 15 2017 Win64" ..
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "cmake generation failed"
+        exit 127
+    }
+    cmake --build . --config $type -- /verbosity:minimal /maxcpucount:3
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "build fail."
+        exit 127
+    }
 }
 
 function run_xunit_impl($type)
