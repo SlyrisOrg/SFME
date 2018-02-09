@@ -9,6 +9,7 @@ set(MODULE_PUBLIC_HEADERS
         ${MODULE_PATH}/event_manager.hpp
         ${MODULE_PATH}/base_event.hpp
         ${MODULE_PATH}/config.hpp
+        ${MODULE_PATH}/common_events.hpp
         )
 
 set(MODULE_PRIVATE_HEADERS

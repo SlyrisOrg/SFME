@@ -1,0 +1,6 @@
+set(SOURCES ecs-test.cpp)
+CREATE_UNIT_TEST(ecs-test SFME: "${SOURCES}")
+target_link_libraries(ecs-test SFME::ECS)
+if (GCC)
+    target_compile_options(ecs-test PRIVATE "-ftemplate-backtrace-limit=0")
+endif()
