@@ -83,7 +83,6 @@ namespace sfme::ecs
         {
             static_assert(details::is_system_v<System>,
                           "The System type given as template parameter doesn't seems to be valid");
-            std::cout << details::generateID<System>() << std::endl;
             return static_cast<System &>(*_systems[System::getSystemType()].at(details::generateID<System>()));
         }
 

@@ -129,3 +129,35 @@ TEST(ECS, GetSystem)
     sysMgr.getSystem<TestSystem>().update();
 }
 
+TEST(ECS, HasSystem)
+{
+    sfme::mediator::EventManager evtMgr;
+    sfme::ecs::SystemManager sysMgr{evtMgr};
+    sysMgr.createSystem<SecondTestSystem>();
+    ASSERT_TRUE(sysMgr.hasSystem<SecondTestSystem>());
+    ASSERT_FALSE(sysMgr.hasSystem<TestSystem>());
+}
+
+TEST(ECS, Size)
+{
+    sfme::mediator::EventManager evtMgr;
+    sfme::ecs::SystemManager sysMgr{evtMgr};
+    sysMgr.createSystem<SecondTestSystem>();
+    ASSERT_EQ(1, sysMgr.size());
+    sysMgr.createSystem<TestSystem>();
+    ASSERT_EQ(2, sysMgr.size());
+}
+
+TEST(ECS, SizePerType)
+{
+    sfme::mediator::EventManager evtMgr;
+    sfme::ecs::SystemManager sysMgr{evtMgr};
+    sysMgr.createSystem<SecondTestSystem>();
+    ASSERT_NE(1, sysMgr.size(sfme::ecs::SystemType::PostUpdate));
+    ASSERT_EQ(1, sysMgr.size(sfme::ecs::SystemType::PreUpdate));
+    sysMgr.createSystem<TestSystem>();
+    ASSERT_EQ(2, sysMgr.size(sfme::ecs::SystemType::PreUpdate));
+    ASSERT_NE(2, sysMgr.size(sfme::ecs::SystemType::LogicUpdate));
+
+}
+
