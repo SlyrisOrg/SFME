@@ -20,7 +20,7 @@ namespace sfme::ecs
 
     public:
         virtual void update() noexcept = 0;
-
+        virtual const std::string &getName() const noexcept = 0;
     protected:
         mediator::EventManager &_evtMgr;
     };
