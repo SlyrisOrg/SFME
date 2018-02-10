@@ -9,6 +9,7 @@
 #include <SFME/ecs/system_type.hpp>
 #include <SFME/timer/timer.hpp>
 #include <SFME/mediator/common_events.hpp>
+#include <SFME/ecs/details/system_type_traits.hpp>
 
 namespace sfme::ecs
 {
@@ -48,15 +49,11 @@ namespace sfme::ecs
         }
 
     public:
-        template <typename System>
-        static constexpr bool is_system_v = std::is_base_of_v<BaseSystem, System> &&
-                                            refl::has_reflectible_class_name_v<System>;
-
         //! Helpers
         template <typename System>
         const System &getSystem(SystemType sysType) const noexcept
         {
-            static_assert(SystemManager::is_system_v<System>,
+            static_assert(details::is_system_v<System>,
                           "The System type given as template parameter doesn't seems to be valid");
             assert(sysType < SystemType::Sentinelle);
             for (auto &&curSystem : _systems.at(sysType)) {
@@ -69,7 +66,7 @@ namespace sfme::ecs
         template <typename System>
         System &getSystem(SystemType sysType) noexcept
         {
-            static_assert(SystemManager::is_system_v<System>,
+            static_assert(details::is_system_v<System>,
                           "The System type given as template parameter doesn't seems to be valid");
             assert(sysType < SystemType::Sentinelle);
             for (auto &&curSystem : _systems.at(sysType)) {
@@ -82,7 +79,7 @@ namespace sfme::ecs
         template <typename System, typename ...Args>
         System &createSystem(SystemType sysType, Args &&...args) noexcept
         {
-            static_assert(SystemManager::is_system_v<System>,
+            static_assert(details::is_system_v<System>,
                           "The System type given as template parameter doesn't seems to be valid");
             assert(sysType < SystemType::Sentinelle);
             auto res = _systems[sysType].emplace_back(std::make_shared<System>(_evtMgr, std::forward<Args>(args)...));
