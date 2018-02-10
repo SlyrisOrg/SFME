@@ -7,7 +7,6 @@
 #include <core/utils/NonCopyable.hpp>
 #include <SFME/mediator/mediator.hpp>
 #include <SFME/ecs/details/system_type_id.hpp>
-#include <SFME/ecs/system_type.hpp>
 
 namespace sfme::ecs
 {

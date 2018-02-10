@@ -5,10 +5,10 @@
 #pragma once
 
 #include <memory>
-#include <SFME/ecs/system_base.hpp>
-#include <SFME/ecs/system_type.hpp>
 #include <SFME/timer/timer.hpp>
 #include <SFME/mediator/common_events.hpp>
+#include <SFME/ecs/system_base.hpp>
+#include <SFME/ecs/system_type.hpp>
 #include <SFME/ecs/details/system_type_traits.hpp>
 
 namespace sfme::ecs

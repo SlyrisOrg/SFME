@@ -5,11 +5,6 @@
             <build_file_path>
                 <compilation_db_path>../g++-Debug-build/compile_commands.json</compilation_db_path>
             </build_file_path>
-            <exclude_paths>
-                <exclude_path>../example/base</exclude_path>
-                <exclude_path>../tests</exclude_path>
-                <exclude_path>../example/mediator/mediator_subscribe.cpp</exclude_path>
-            </exclude_paths>
             <name>C/C++ from Compilation Database</name>
             <source_paths>
                 <source_path>../SFME</source_path>

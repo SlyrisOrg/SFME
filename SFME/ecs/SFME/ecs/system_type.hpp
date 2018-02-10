@@ -11,6 +11,6 @@ namespace sfme::ecs
         PreUpdate = 0,
         LogicUpdate = 1,
         PostUpdate = 2,
-        Sentinelle = 3
+        Sentinelle = 3,
     };
 }
