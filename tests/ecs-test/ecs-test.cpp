@@ -4,26 +4,38 @@
 
 #include <gtest/gtest.h>
 #include <SFME/ecs/ecs.hpp>
+#include <typeindex>
 
-struct TestSystem : public sfme::ecs::BaseSystem
+struct TestSystem : public sfme::ecs::System<TestSystem>
 {
     reflect_class(TestSystem);
 
-    TestSystem(sfme::mediator::EventManager &evtMgr) noexcept : BaseSystem(evtMgr)
+    TestSystem(sfme::mediator::EventManager &evtMgr) noexcept : System<TestSystem>(evtMgr)
     {
     }
 
     void update() noexcept override
     {
-        std::cout << getName() << std::endl;
-    }
-
-    const std::string &getName() const noexcept override
-    {
-        return TestSystem::className();
+        std::cout << getType() << std::endl;
     }
 
     ~TestSystem() noexcept override = default;
+};
+
+struct SecondTestSystem : public sfme::ecs::System<SecondTestSystem>
+{
+    reflect_class(SecondTestSystem);
+
+    SecondTestSystem(sfme::mediator::EventManager &evtMgr) noexcept : System<SecondTestSystem>(evtMgr)
+    {
+    }
+
+    void update() noexcept override
+    {
+        std::cout << getType() << std::endl;
+    }
+
+    ~SecondTestSystem() noexcept override = default;
 };
 
 TEST(ECS, AddSystem)
@@ -34,6 +46,15 @@ TEST(ECS, AddSystem)
     res.update();
 }
 
+TEST(ECS, AddMultipleSystem)
+{
+    sfme::mediator::EventManager evtMgr;
+    sfme::ecs::SystemManager sysMgr{evtMgr};
+    sysMgr.loadSystems<TestSystem, SecondTestSystem>(sfme::ecs::SystemType::PreUpdate);
+    evtMgr.emit<sfme::mediator::evt::GameStarted>();
+    sysMgr.update();
+}
+
 TEST(ECS, GetSystem)
 {
     sfme::mediator::EventManager evtMgr;
@@ -41,3 +62,4 @@ TEST(ECS, GetSystem)
     sysMgr.createSystem<TestSystem>(sfme::ecs::SystemType::LogicUpdate);
     sysMgr.getSystem<TestSystem>(sfme::ecs::SystemType::LogicUpdate).update();
 }
+
