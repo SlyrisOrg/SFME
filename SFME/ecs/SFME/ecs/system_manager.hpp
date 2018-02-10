@@ -53,51 +53,74 @@ namespace sfme::ecs
         }
 
         template <typename ...Systems>
-        void loadSystems(SystemType sysType) noexcept
+        void loadSystems() noexcept
         {
-            (createSystem<Systems>(sysType), ...);
+            (createSystem<Systems>(), ...);
         }
 
-    public:
-        //! Helpers
+        size_t size() const noexcept
+        {
+            return _systems.at(SystemType::PreUpdate).size() + _systems.at(SystemType::LogicUpdate).size() +
+                   _systems.at(SystemType::PostUpdate).size();
+        }
+
+        size_t size(SystemType sysType) const noexcept
+        {
+            assert(sysType < SystemType::Sentinelle);
+            return _systems.at(sysType).size();
+        }
+
         template <typename System>
-        const System &getSystem(SystemType sysType) const noexcept
+        const System &getSystem() const noexcept
         {
             static_assert(details::is_system_v<System>,
                           "The System type given as template parameter doesn't seems to be valid");
-            assert(sysType < SystemType::Sentinelle);
-            return static_cast<System &>(*_systems.at(sysType).at(details::generateID<System>()));
+            return static_cast<System &>(*_systems.at(System::getSystemType()).at(details::generateID<System>()));
         }
 
         template <typename System>
-        System &getSystem(SystemType sysType) noexcept
+        System &getSystem() noexcept
         {
             static_assert(details::is_system_v<System>,
                           "The System type given as template parameter doesn't seems to be valid");
-            assert(sysType < SystemType::Sentinelle);
-            return static_cast<System &>(*_systems.at(sysType).at(details::generateID<System>()));
+            std::cout << details::generateID<System>() << std::endl;
+            return static_cast<System &>(*_systems[System::getSystemType()].at(details::generateID<System>()));
         }
 
         template <typename System, typename ...Args>
-        System &createSystem(SystemType sysType, Args &&...args) noexcept
+        System &createSystem(Args &&...args) noexcept
         {
             static_assert(details::is_system_v<System>,
                           "The System type given as template parameter doesn't seems to be valid");
-            assert(sysType < SystemType::Sentinelle);
-            return static_cast<System &>(addSystem(sysType,
-                                                   std::make_shared<System>(_evtMgr, std::forward<Args>(args)...)));
+            return static_cast<System &>(addSystem<System>(std::make_shared<System>(_evtMgr,
+                                                                                    std::forward<Args>(args)...)));
+        }
+
+        template <typename System>
+        bool hasSystem() const noexcept
+        {
+            static_assert(details::is_system_v<System>,
+                          "The System type given as template parameter doesn't seems to be valid");
+            auto &&curSystems = _systems.at(System::getSystemType());
+            return curSystems.find(details::generateID<System>()) != curSystems.end();
         }
 
     private:
-        BaseSystem &addSystem(SystemType sysType, SystemPtr system) noexcept
+        template <typename System>
+        BaseSystem &addSystem(SystemPtr system) noexcept
         {
-            return *_systems[sysType].emplace(system->getType(), system).first->second;
+            return *_systems[System::getSystemType()].emplace(details::generateID<System>(), system).first->second;
         }
 
     private:
         //! Private members
         timer::TimeStep _timeStep;
         sfme::mediator::EventManager &_evtMgr;
-        std::unordered_map<SystemType, SystemMap> _systems;
+        std::unordered_map<SystemType, SystemMap> _systems
+            {
+                {SystemType::PreUpdate,   {}},
+                {SystemType::LogicUpdate, {}},
+                {SystemType::PostUpdate,  {}}
+            };
     };
 }

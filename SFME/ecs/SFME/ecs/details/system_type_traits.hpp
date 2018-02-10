@@ -12,5 +12,5 @@ namespace sfme::ecs::details
 {
     template <typename System>
     static constexpr bool is_system_v = std::is_base_of_v<BaseSystem, System> &&
-    refl::has_reflectible_class_name_v<System>;
+    refl::has_reflectible_class_name_v<System> && System::getSystemType() < SystemType::Sentinelle;
 }
