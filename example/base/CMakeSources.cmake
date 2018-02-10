@@ -1,1 +1,0 @@
-set(SFME_BASE_EXAMPLE_SOURCES main.cpp)

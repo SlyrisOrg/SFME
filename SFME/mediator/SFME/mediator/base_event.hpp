@@ -17,6 +17,6 @@ namespace sfme::mediator
             _log(logging::Debug) << "Events " << eventName << " triggered." << std::endl;
         }
 
-        logging::Logger _log{"base-event", logging::Debug};
+        logging::Logger _log{"timestep-event", logging::Debug};
     };
 }

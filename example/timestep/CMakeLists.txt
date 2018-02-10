@@ -1,0 +1,6 @@
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_config)
+find_package(SFML 2 COMPONENTS graphics system audio network window)
+include(CMakeSources.cmake)
+add_executable(sfme_timestep_example ${SFME_TIMESTEP_EXAMPLE_SOURCES})
+target_include_directories(sfme_timestep_example PRIVATE ${SFML_INCLUDE_DIRECTORIES})
+target_link_libraries(sfme_timestep_example SFME::Timer ${SFML_LIBRARIES})

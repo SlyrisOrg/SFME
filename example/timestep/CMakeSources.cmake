@@ -1,0 +1,1 @@
+set(SFME_TIMESTEP_EXAMPLE_SOURCES main.cpp)
