@@ -6,6 +6,8 @@
 
 #include <core/utils/NonCopyable.hpp>
 #include <SFME/mediator/mediator.hpp>
+#include <SFME/ecs/details/system_type_id.hpp>
+#include "system_type.hpp"
 
 namespace sfme::ecs
 {
@@ -20,8 +22,45 @@ namespace sfme::ecs
 
     public:
         virtual void update() noexcept = 0;
-        virtual const std::string &getName() const noexcept = 0;
+        virtual typeID getType() const noexcept = 0;
+
+    public:
+        void mark() noexcept
+        {
+            _marked = true;
+        }
+
+        void unmark() noexcept
+        {
+            _marked = false;
+        }
+
+        bool isMarked() const noexcept
+        {
+            return _marked;
+        }
+
     protected:
         mediator::EventManager &_evtMgr;
+        bool _marked{false};
+    };
+
+    template <typename SystemDerived>
+    class System : public BaseSystem
+    {
+    public:
+        template <typename ...Args>
+        explicit System(Args &&...args) : BaseSystem(std::forward<Args>(args)...)
+        {
+        }
+
+        ~System() noexcept override = default;
+
+        void update() noexcept override = 0;
+
+        typeID getType() const noexcept final
+        {
+            return details::generateID<SystemDerived>();
+        }
     };
 }

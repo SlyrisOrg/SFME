@@ -15,6 +15,10 @@ namespace sfme::ecs
 {
     class SystemManager final : public sfme::mediator::Receiver<SystemManager>
     {
+    private:
+        //! Typedefs
+        using SystemPtr = std::shared_ptr<BaseSystem>;
+        using SystemMap = std::unordered_map<typeID, SystemPtr>;
     public:
         //! Constructor
         SystemManager(sfme::mediator::EventManager &evtMgr) noexcept : _evtMgr(evtMgr)
@@ -35,7 +39,7 @@ namespace sfme::ecs
         {
             auto updateSystem = [this](SystemType sysType) noexcept {
                 for (auto &&curSystem : _systems[sysType]) {
-                    curSystem->update();
+                    curSystem.second->update();
                 }
             };
 
@@ -48,6 +52,12 @@ namespace sfme::ecs
             updateSystem(SystemType::PostUpdate);
         }
 
+        template <typename ...Systems>
+        void loadSystems(SystemType sysType) noexcept
+        {
+            (createSystem<Systems>(sysType), ...);
+        }
+
     public:
         //! Helpers
         template <typename System>
@@ -56,11 +66,7 @@ namespace sfme::ecs
             static_assert(details::is_system_v<System>,
                           "The System type given as template parameter doesn't seems to be valid");
             assert(sysType < SystemType::Sentinelle);
-            for (auto &&curSystem : _systems.at(sysType)) {
-                if (curSystem->getName() == System::className())
-                    return static_cast<System &>(*curSystem);
-            }
-            return static_cast<System &>(*_systems.at(sysType).begin()->get());
+            return static_cast<System &>(*_systems.at(sysType).at(details::generateID<System>()));
         }
 
         template <typename System>
@@ -69,11 +75,7 @@ namespace sfme::ecs
             static_assert(details::is_system_v<System>,
                           "The System type given as template parameter doesn't seems to be valid");
             assert(sysType < SystemType::Sentinelle);
-            for (auto &&curSystem : _systems.at(sysType)) {
-                if (curSystem->getName() == System::className())
-                    return static_cast<System &>(*curSystem);
-            }
-            return static_cast<System &>(*_systems.at(sysType).begin()->get());
+            return static_cast<System &>(*_systems.at(sysType).at(details::generateID<System>()));
         }
 
         template <typename System, typename ...Args>
@@ -82,19 +84,20 @@ namespace sfme::ecs
             static_assert(details::is_system_v<System>,
                           "The System type given as template parameter doesn't seems to be valid");
             assert(sysType < SystemType::Sentinelle);
-            auto res = _systems[sysType].emplace_back(std::make_shared<System>(_evtMgr, std::forward<Args>(args)...));
-            return static_cast<System &>(*res);
+            return static_cast<System &>(addSystem(sysType,
+                                                   std::make_shared<System>(_evtMgr, std::forward<Args>(args)...)));
         }
 
     private:
-        //! Typedefs
-        using SystemPtr = std::shared_ptr<BaseSystem>;
-        using SystemArray = std::vector<SystemPtr>;
+        BaseSystem &addSystem(SystemType sysType, SystemPtr system) noexcept
+        {
+            return *_systems[sysType].emplace(system->getType(), system).first->second;
+        }
 
     private:
         //! Private members
         timer::TimeStep _timeStep;
         sfme::mediator::EventManager &_evtMgr;
-        std::unordered_map<SystemType, SystemArray> _systems;
+        std::unordered_map<SystemType, SystemMap> _systems;
     };
 }
