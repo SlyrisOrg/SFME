@@ -5,6 +5,7 @@
 #pragma once
 
 #include <type_traits>
+#include <SFME/mediator/base_event.hpp>
 
 namespace sfme::mediator::details
 {

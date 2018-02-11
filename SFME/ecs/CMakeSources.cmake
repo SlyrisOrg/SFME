@@ -5,9 +5,11 @@ set(MODULE_PATH
 
 set(MODULE_PUBLIC_HEADERS
         "${MODULE_PATH}/ecs.hpp"
+        "${MODULE_PATH}/entity_manager.hpp"
         "${MODULE_PATH}/system_manager.hpp"
         "${MODULE_PATH}/system_base.hpp"
         "${MODULE_PATH}/system_type.hpp"
+        "${MODULE_PATH}/world.hpp"
         )
 
 set(MODULE_PRIVATE_HEADERS

@@ -13,7 +13,9 @@
 
 namespace sfme::ecs
 {
-    class SystemManager final : public sfme::mediator::Receiver<SystemManager>
+    //TODO: Remove int
+    template <typename EntityManager = int>
+    class SystemManager final : public sfme::mediator::Receiver<SystemManager<EntityManager>>
     {
     private:
         //! Typedefs
@@ -22,7 +24,8 @@ namespace sfme::ecs
         using SystemArray = std::array<SystemMap, SystemType::Size>;
     public:
         //! Constructor
-        SystemManager(sfme::mediator::EventManager &evtMgr) noexcept : _evtMgr(evtMgr)
+        SystemManager(sfme::mediator::EventManager &evtMgr, EntityManager &ettMgr) noexcept : _evtMgr(evtMgr),
+                                                                                              _ettMgr(ettMgr)
         {
             _evtMgr.subscribe<sfme::mediator::evt::GameStarted>(*this);
         }
@@ -174,6 +177,7 @@ namespace sfme::ecs
         bool _needToSweep{false};
         timer::TimeStep _timeStep;
         sfme::mediator::EventManager &_evtMgr;
+        EntityManager &_ettMgr;
         SystemArray _systems{{}};
     };
 }

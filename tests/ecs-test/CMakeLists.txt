@@ -1,5 +1,5 @@
 macro(generate_local_test FILENAME EXENAME)
-    set(SOURCES ${FILENAME})
+    set(SOURCES ${FILENAME} common_ecs_test.hpp)
     CREATE_UNIT_TEST(${EXENAME} SFME: "${SOURCES}")
     target_link_libraries(${EXENAME} SFME::ECS)
 endmacro()
