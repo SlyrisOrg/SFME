@@ -139,6 +139,20 @@ TEST(ECS, HasSystem)
     ASSERT_FALSE(sysMgr.hasSystem<TestSystem>());
 }
 
+TEST(ECS, HasSystems)
+{
+    sfme::mediator::EventManager evtMgr;
+    sfme::ecs::SystemManager sysMgr{evtMgr};
+    sysMgr.loadSystems<PostSystem, LogicalSystem, SecondTestSystem>();
+    ASSERT_TRUE(sysMgr.hasSystems<SecondTestSystem>());
+    bool res = sysMgr.hasSystems<SecondTestSystem, LogicalSystem>();
+    ASSERT_TRUE(res);
+    res = sysMgr.hasSystems<SecondTestSystem, TestSystem>();
+    ASSERT_FALSE(res);
+    res = sysMgr.hasSystems<TestSystem>();
+    ASSERT_FALSE(res);
+}
+
 TEST(ECS, Size)
 {
     sfme::mediator::EventManager evtMgr;

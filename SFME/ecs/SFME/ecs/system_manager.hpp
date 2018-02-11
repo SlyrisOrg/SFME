@@ -121,6 +121,12 @@ namespace sfme::ecs
             return curSystems.find(details::generateID<System>()) != curSystems.end();
         }
 
+        template <typename ... Systems>
+        bool hasSystems() const noexcept
+        {
+            return (hasSystem<Systems>() && ...);
+        }
+
         template <typename System>
         bool markSystem() noexcept
         {
@@ -138,9 +144,7 @@ namespace sfme::ecs
         template <typename ... Systems>
         bool markSystems() noexcept
         {
-            bool res = true;
-            res = (markSystem<Systems>() && ...);
-            return res;
+            return (markSystem<Systems>() && ...);
         }
 
         void sweepSystems() noexcept
