@@ -13,4 +13,8 @@ namespace sfme::ecs
         PostUpdate = 2,
         Size = 3,
     };
+
+    using TPreUpdate = utils::NamedType<SystemType, struct PreUpdateTag>;
+    using TLogicUpdate = utils::NamedType<SystemType, struct TLogicUpdateTag>;
+    using TPostUpdate = utils::NamedType<SystemType, struct TPostUpdateTag>;
 }

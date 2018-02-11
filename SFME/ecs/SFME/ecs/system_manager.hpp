@@ -5,6 +5,7 @@
 #pragma once
 
 #include <memory>
+#include <cassert>
 #include <SFME/timer/timer.hpp>
 #include <SFME/mediator/common_events.hpp>
 #include <SFME/ecs/system_base.hpp>
