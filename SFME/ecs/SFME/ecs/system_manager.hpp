@@ -46,7 +46,7 @@ namespace sfme::ecs
 
             updateSystem(SystemType::PreUpdate);
             _timeStep.startFrame();
-            while (_timeStep.isUpdateRequired()) {
+            while (_timeStep.isUpdateRequired() && size(SystemType::LogicUpdate) > 0) {
                 updateSystem(SystemType::LogicUpdate);
                 _timeStep.performUpdate();
             }

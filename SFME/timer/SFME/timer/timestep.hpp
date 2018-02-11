@@ -44,6 +44,6 @@ namespace sfme::timer
         using clock = std::chrono::steady_clock;
         std::chrono::nanoseconds _lag{0ns};
         std::chrono::nanoseconds _timestep{_60fps};
-        clock::time_point _start;
+        clock::time_point _start{clock::now()};
     };
 }

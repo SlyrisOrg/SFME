@@ -36,6 +36,7 @@ struct LogicalSystem : public sfme::ecs::System<LogicalSystem>
 
     void update() noexcept override
     {
+        std::cout << __FUNCTION__ << std::endl;
     }
 
     static constexpr sfme::ecs::SystemType getSystemType() noexcept
@@ -114,7 +115,7 @@ TEST(ECS, TestAllKindOfSystem)
     ASSERT_EQ(4, sysMgr.size());
     evtMgr.emit<sfme::mediator::evt::GameStarted>();
     int i = 0;
-    while (i < 10000) {
+    while (i < 100000) {
         sysMgr.update();
         i++;
     }
@@ -168,9 +169,11 @@ TEST(ECS, RemoveSystem)
     ASSERT_EQ(4, sysMgr.size());
     sysMgr.markSystem<PostSystem>();
     ASSERT_TRUE(sysMgr.getSystem<PostSystem>().isMarked());
+    evtMgr.emit<sfme::mediator::evt::GameStarted>();
     sysMgr.update();
     ASSERT_EQ(3, sysMgr.size());
 }
+
 
 TEST(ECS, RemoveSystemDuplicata)
 {
@@ -180,6 +183,7 @@ TEST(ECS, RemoveSystemDuplicata)
     ASSERT_EQ(4, sysMgr.size());
     ASSERT_TRUE(sysMgr.markSystem<PostSystem>());
     ASSERT_TRUE(sysMgr.getSystem<PostSystem>().isMarked());
+    evtMgr.emit<sfme::mediator::evt::GameStarted>();
     sysMgr.update();
     ASSERT_FALSE(sysMgr.markSystem<PostSystem>());
     sysMgr.update();
@@ -195,6 +199,7 @@ TEST(ECS, AddThenRemoveThenAdd)
     ASSERT_TRUE(sysMgr.markSystem<PostSystem>());
     ASSERT_TRUE(sysMgr.markSystem<LogicalSystem>());
     ASSERT_TRUE(sysMgr.getSystem<PostSystem>().isMarked());
+    evtMgr.emit<sfme::mediator::evt::GameStarted>();
     sysMgr.update();
     ASSERT_EQ(2, sysMgr.size());
     sysMgr.loadSystems<LogicalSystem, PostSystem>();
@@ -209,6 +214,7 @@ TEST(ECS, MarkSystems)
     ASSERT_EQ(4, sysMgr.size());
     bool res = sysMgr.markSystems<PostSystem, LogicalSystem, SecondTestSystem, TestSystem>();
     ASSERT_TRUE(res);
+    evtMgr.emit<sfme::mediator::evt::GameStarted>();
     sysMgr.update();
     ASSERT_EQ(0, sysMgr.size());
 }
@@ -221,6 +227,7 @@ TEST(ECS, MarkSystemsFold)
     ASSERT_EQ(3, sysMgr.size());
     bool res = sysMgr.markSystems<PostSystem, LogicalSystem, SecondTestSystem, TestSystem>();
     ASSERT_FALSE(res);
+    evtMgr.emit<sfme::mediator::evt::GameStarted>();
     sysMgr.update();
     ASSERT_EQ(3, sysMgr.size());
     res = sysMgr.markSystems<LogicalSystem, SecondTestSystem, TestSystem, PostSystem>();
