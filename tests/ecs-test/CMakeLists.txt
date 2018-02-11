@@ -5,3 +5,8 @@ macro(generate_local_test FILENAME EXENAME)
 endmacro()
 
 generate_local_test(ecs-system-test.cpp ecs-system-test)
+if (GCC OR CLANG)
+    target_compile_options(ecs-system-test PUBLIC -O3 -march=native)
+elseif(MSVC)
+    target_compile_options(ecs-system-test PUBLIC /O2)
+endif()
