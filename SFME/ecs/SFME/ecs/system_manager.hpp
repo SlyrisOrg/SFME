@@ -55,6 +55,17 @@ namespace sfme::ecs
                 sweepSystems();
         }
 
+        template <typename System, typename ...Args>
+        System &createSystem(Args &&...args) noexcept
+        {
+            static_assert(details::is_system_v<System>,
+                          "The System type given as template parameter doesn't seems to be valid");
+            if (hasSystem<System>())
+                return getSystem<System>();
+            return static_cast<System &>(addSystem<System>(std::make_shared<System>(_evtMgr,
+                                                                                    std::forward<Args>(args)...)));
+        }
+
         template <typename ...Systems>
         void loadSystems() noexcept
         {
@@ -63,7 +74,8 @@ namespace sfme::ecs
 
         size_t size() const noexcept
         {
-            return _systems.at(SystemType::PreUpdate).size() + _systems.at(SystemType::LogicUpdate).size() +
+            return _systems.at(SystemType::PreUpdate).size() +
+                   _systems.at(SystemType::LogicUpdate).size() +
                    _systems.at(SystemType::PostUpdate).size();
         }
 
@@ -101,17 +113,6 @@ namespace sfme::ecs
             return {getSystem<Systems>()...};
         }
 
-        template <typename System, typename ...Args>
-        System &createSystem(Args &&...args) noexcept
-        {
-            static_assert(details::is_system_v<System>,
-                          "The System type given as template parameter doesn't seems to be valid");
-            if (hasSystem<System>())
-                return getSystem<System>();
-            return static_cast<System &>(addSystem<System>(std::make_shared<System>(_evtMgr,
-                                                                                    std::forward<Args>(args)...)));
-        }
-
         template <typename System>
         bool hasSystem() const noexcept
         {
@@ -147,6 +148,13 @@ namespace sfme::ecs
             return (markSystem<Systems>() && ...);
         }
 
+    private:
+        template <typename System>
+        BaseSystem &addSystem(SystemPtr system) noexcept
+        {
+            return *_systems[System::getSystemType()].emplace(details::generateID<System>(), system).first->second;
+        }
+
         void sweepSystems() noexcept
         {
             for (auto &&curSystem : _systems) {
@@ -159,13 +167,6 @@ namespace sfme::ecs
                 }
             }
             _needToSweep = false;
-        }
-
-    private:
-        template <typename System>
-        BaseSystem &addSystem(SystemPtr system) noexcept
-        {
-            return *_systems[System::getSystemType()].emplace(details::generateID<System>(), system).first->second;
         }
 
     private:

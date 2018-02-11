@@ -188,7 +188,6 @@ TEST(ECS, RemoveSystem)
     ASSERT_EQ(3, sysMgr.size());
 }
 
-
 TEST(ECS, RemoveSystemDuplicata)
 {
     sfme::mediator::EventManager evtMgr;
