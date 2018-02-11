@@ -17,4 +17,6 @@ namespace sfme::testing
     }
 
     using Components = meta::TypeList<components::Box>;
+    using EntityManager = sfme::ecs::EntityManager<Components>;
+    using Entity = EntityManager::Entity;
 }

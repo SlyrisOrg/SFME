@@ -13,8 +13,7 @@
 
 namespace sfme::ecs
 {
-    //TODO: Remove int
-    template <typename EntityManager = int>
+    template <typename EntityManager>
     class SystemManager final : public sfme::mediator::Receiver<SystemManager<EntityManager>>
     {
     private:
@@ -65,7 +64,7 @@ namespace sfme::ecs
                           "The System type given as template parameter doesn't seems to be valid");
             if (hasSystem<System>())
                 return getSystem<System>();
-            return static_cast<System &>(addSystem<System>(std::make_shared<System>(_evtMgr,
+            return static_cast<System &>(addSystem<System>(std::make_shared<System>(_evtMgr, _ettMgr,
                                                                                     std::forward<Args>(args)...)));
         }
 

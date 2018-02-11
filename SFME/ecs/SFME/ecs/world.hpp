@@ -10,14 +10,15 @@
 
 namespace sfme::ecs
 {
-    template<typename ECS>
+    template <typename ECS>
     class World
     {
     private:
+        using EventManager = sfme::mediator::EventManager;
         using EntityManager = sfme::ecs::EntityManager<ECS>;
         using SystemManager = sfme::ecs::SystemManager<EntityManager>;
     protected:
-        sfme::mediator::EventManager _evtMgr;
+        EventManager _evtMgr;
         EntityManager _ettMgr;
         SystemManager _sysMgr{_evtMgr, _ettMgr};
     };
