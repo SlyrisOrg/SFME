@@ -19,6 +19,7 @@ namespace sfme::ecs
         //! Typedefs
         using SystemPtr = std::shared_ptr<BaseSystem>;
         using SystemMap = std::unordered_map<typeID, SystemPtr>;
+        using SystemArray = std::array<SystemMap, SystemType::Size>;
     public:
         //! Constructor
         SystemManager(sfme::mediator::EventManager &evtMgr) noexcept : _evtMgr(evtMgr)
@@ -50,6 +51,8 @@ namespace sfme::ecs
                 _timeStep.performUpdate();
             }
             updateSystem(SystemType::PostUpdate);
+            if (_needToSweep)
+                sweepSystems();
         }
 
         template <typename ...Systems>
@@ -66,7 +69,7 @@ namespace sfme::ecs
 
         size_t size(SystemType sysType) const noexcept
         {
-            assert(sysType < SystemType::Sentinelle);
+            assert(sysType < SystemType::Size);
             return _systems.at(sysType).size();
         }
 
@@ -86,11 +89,25 @@ namespace sfme::ecs
             return static_cast<System &>(*_systems[System::getSystemType()].at(details::generateID<System>()));
         }
 
+        template <typename ...Systems>
+        std::tuple<std::add_lvalue_reference_t<Systems>...> getSystems() noexcept
+        {
+            return {getSystem<Systems>()...};
+        }
+
+        template <typename ...Systems>
+        std::tuple<std::add_lvalue_reference_t<std::add_const_t<Systems>>...> getSystems() const noexcept
+        {
+            return {getSystem<Systems>()...};
+        }
+
         template <typename System, typename ...Args>
         System &createSystem(Args &&...args) noexcept
         {
             static_assert(details::is_system_v<System>,
                           "The System type given as template parameter doesn't seems to be valid");
+            if (hasSystem<System>())
+                return getSystem<System>();
             return static_cast<System &>(addSystem<System>(std::make_shared<System>(_evtMgr,
                                                                                     std::forward<Args>(args)...)));
         }
@@ -104,6 +121,42 @@ namespace sfme::ecs
             return curSystems.find(details::generateID<System>()) != curSystems.end();
         }
 
+        template <typename System>
+        bool markSystem() noexcept
+        {
+            static_assert(details::is_system_v<System>,
+                          "The System type given as template parameter doesn't seems to be valid");
+            if (hasSystem<System>()) {
+                getSystem<System>().mark();
+                _needToSweep = true;
+                return true;
+            }
+            _needToSweep = false;
+            return false;
+        }
+
+        template <typename ... Systems>
+        bool markSystems() noexcept
+        {
+            bool res = true;
+            res = (markSystem<Systems>() && ...);
+            return res;
+        }
+
+        void sweepSystems() noexcept
+        {
+            for (auto &&curSystem : _systems) {
+                for (auto it = curSystem.begin(); it != curSystem.end();) {
+                    if (it->second->isMarked()) {
+                        it = curSystem.erase(it);
+                    } else {
+                        ++it;
+                    }
+                }
+            }
+            _needToSweep = false;
+        }
+
     private:
         template <typename System>
         BaseSystem &addSystem(SystemPtr system) noexcept
@@ -113,13 +166,9 @@ namespace sfme::ecs
 
     private:
         //! Private members
+        bool _needToSweep{false};
         timer::TimeStep _timeStep;
         sfme::mediator::EventManager &_evtMgr;
-        std::unordered_map<SystemType, SystemMap> _systems
-            {
-                {SystemType::PreUpdate,   {}},
-                {SystemType::LogicUpdate, {}},
-                {SystemType::PostUpdate,  {}}
-            };
+        SystemArray _systems{{}};
     };
 }

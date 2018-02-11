@@ -158,6 +158,84 @@ TEST(ECS, SizePerType)
     sysMgr.createSystem<TestSystem>();
     ASSERT_EQ(2, sysMgr.size(sfme::ecs::SystemType::PreUpdate));
     ASSERT_NE(2, sysMgr.size(sfme::ecs::SystemType::LogicUpdate));
-
 }
 
+TEST(ECS, RemoveSystem)
+{
+    sfme::mediator::EventManager evtMgr;
+    sfme::ecs::SystemManager sysMgr{evtMgr};
+    sysMgr.loadSystems<PostSystem, LogicalSystem, SecondTestSystem, TestSystem>();
+    ASSERT_EQ(4, sysMgr.size());
+    sysMgr.markSystem<PostSystem>();
+    ASSERT_TRUE(sysMgr.getSystem<PostSystem>().isMarked());
+    sysMgr.update();
+    ASSERT_EQ(3, sysMgr.size());
+}
+
+TEST(ECS, RemoveSystemDuplicata)
+{
+    sfme::mediator::EventManager evtMgr;
+    sfme::ecs::SystemManager sysMgr{evtMgr};
+    sysMgr.loadSystems<PostSystem, LogicalSystem, SecondTestSystem, TestSystem>();
+    ASSERT_EQ(4, sysMgr.size());
+    ASSERT_TRUE(sysMgr.markSystem<PostSystem>());
+    ASSERT_TRUE(sysMgr.getSystem<PostSystem>().isMarked());
+    sysMgr.update();
+    ASSERT_FALSE(sysMgr.markSystem<PostSystem>());
+    sysMgr.update();
+    ASSERT_EQ(3, sysMgr.size());
+}
+
+TEST(ECS, AddThenRemoveThenAdd)
+{
+    sfme::mediator::EventManager evtMgr;
+    sfme::ecs::SystemManager sysMgr{evtMgr};
+    sysMgr.loadSystems<PostSystem, LogicalSystem, SecondTestSystem, TestSystem>();
+    ASSERT_EQ(4, sysMgr.size());
+    ASSERT_TRUE(sysMgr.markSystem<PostSystem>());
+    ASSERT_TRUE(sysMgr.markSystem<LogicalSystem>());
+    ASSERT_TRUE(sysMgr.getSystem<PostSystem>().isMarked());
+    sysMgr.update();
+    ASSERT_EQ(2, sysMgr.size());
+    sysMgr.loadSystems<LogicalSystem, PostSystem>();
+    ASSERT_EQ(4, sysMgr.size());
+}
+
+TEST(ECS, MarkSystems)
+{
+    sfme::mediator::EventManager evtMgr;
+    sfme::ecs::SystemManager sysMgr{evtMgr};
+    sysMgr.loadSystems<PostSystem, LogicalSystem, SecondTestSystem, TestSystem>();
+    ASSERT_EQ(4, sysMgr.size());
+    bool res = sysMgr.markSystems<PostSystem, LogicalSystem, SecondTestSystem, TestSystem>();
+    ASSERT_TRUE(res);
+    sysMgr.update();
+    ASSERT_EQ(0, sysMgr.size());
+}
+
+TEST(ECS, MarkSystemsFold)
+{
+    sfme::mediator::EventManager evtMgr;
+    sfme::ecs::SystemManager sysMgr{evtMgr};
+    sysMgr.loadSystems<LogicalSystem, SecondTestSystem, TestSystem>();
+    ASSERT_EQ(3, sysMgr.size());
+    bool res = sysMgr.markSystems<PostSystem, LogicalSystem, SecondTestSystem, TestSystem>();
+    ASSERT_FALSE(res);
+    sysMgr.update();
+    ASSERT_EQ(3, sysMgr.size());
+    res = sysMgr.markSystems<LogicalSystem, SecondTestSystem, TestSystem, PostSystem>();
+    ASSERT_FALSE(res);
+    sysMgr.update();
+    ASSERT_EQ(3, sysMgr.size());
+}
+
+TEST(ECS, GetSystems)
+{
+    sfme::mediator::EventManager evtMgr;
+    sfme::ecs::SystemManager sysMgr{evtMgr};
+    sysMgr.loadSystems<LogicalSystem, SecondTestSystem, TestSystem>();
+    const auto &[logical, second, test] = sysMgr.getSystems<LogicalSystem, SecondTestSystem, TestSystem>();
+    ASSERT_EQ(std::decay_t<decltype(logical)>::getSystemType(), sfme::ecs::SystemType::LogicUpdate);
+    ASSERT_EQ(std::decay_t<decltype(second)>::getSystemType(), sfme::ecs::SystemType::PreUpdate);
+    ASSERT_EQ(std::decay_t<decltype(test)>::getSystemType(), sfme::ecs::SystemType::PreUpdate);
+}

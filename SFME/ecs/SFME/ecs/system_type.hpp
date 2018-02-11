@@ -6,11 +6,11 @@
 
 namespace sfme::ecs
 {
-    enum class SystemType
+    enum SystemType
     {
         PreUpdate = 0,
         LogicUpdate = 1,
         PostUpdate = 2,
-        Sentinelle = 3,
+        Size = 3,
     };
 }
