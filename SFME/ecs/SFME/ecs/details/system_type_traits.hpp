@@ -12,6 +12,19 @@
 
 namespace sfme::ecs::details
 {
+
+    using PluginSystem = struct PluginSystemTag;
+    using NoPluginSystem = struct NoPluginSystemTag;
+
+    template <typename isPlugin>
+    static constexpr bool is_plugged_system_v() noexcept
+    {
+        if constexpr (std::is_same_v<isPlugin, PluginSystem>)
+            return true;
+        else
+            return false;
+    }
+
     using KindSystemList = meta::TypeList<TLogicUpdate, TPreUpdate, TPostUpdate>;
 
     template <typename ...Types>
@@ -22,5 +35,6 @@ namespace sfme::ecs::details
 
     template <typename System>
     static constexpr bool is_system_v = std::is_base_of_v<BaseSystem, System> &&
-    refl::has_reflectible_class_name_v<System> && System::getSystemType() < SystemType::Size;
+                                        refl::has_reflectible_class_name_v<System> &&
+                                        System::getSystemType() < SystemType::Size;
 }

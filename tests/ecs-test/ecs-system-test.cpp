@@ -6,6 +6,7 @@
 #include <SFME/ecs/ecs.hpp>
 #include <typeindex>
 #include "common_ecs_test.hpp"
+#include "ecs_plugin_foo.hpp"
 
 struct TestSystem : public sfme::ecs::PreUpdateSystem<TestSystem>
 {
@@ -87,6 +88,19 @@ class TestingSystem : public sfme::ecs::World<sfme::testing::Components>, public
 protected:
     void SetUp() override
     {
+    }
+
+    void TearDown() override
+    {
+    }
+};
+
+class TestingSystemPlugins : public sfme::ecs::World<sfme::testing::Components>, public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        ASSERT_TRUE(_sysMgr.loadPlugin<sfme::testing::plugins::FooSystem>("ecs-plugin-foo"));
     }
 
     void TearDown() override
@@ -238,4 +252,30 @@ TEST_F(TestingSystem, GetSystems)
     ASSERT_EQ(std::decay_t<decltype(logical)>::getSystemType(), sfme::ecs::SystemType::LogicUpdate);
     ASSERT_EQ(std::decay_t<decltype(second)>::getSystemType(), sfme::ecs::SystemType::PreUpdate);
     ASSERT_EQ(std::decay_t<decltype(test)>::getSystemType(), sfme::ecs::SystemType::PreUpdate);
+}
+
+TEST_F(TestingSystemPlugins, GetSystem)
+{
+    ASSERT_EQ(1, _sysMgr.size());
+    _sysMgr.getSystem<sfme::testing::plugins::FooSystem>().update();
+}
+
+TEST_F(TestingSystemPlugins, GetSystems)
+{
+    _sysMgr.createSystem<LogicalSystem>();
+    ASSERT_EQ(2, _sysMgr.size());
+    const auto &[logical, foo] = _sysMgr.getSystems<LogicalSystem, sfme::testing::plugins::FooSystem>();
+    ASSERT_EQ(std::decay_t<decltype(logical)>::getSystemType(), sfme::ecs::SystemType::LogicUpdate);
+    ASSERT_EQ(std::decay_t<decltype(foo)>::getSystemType(), sfme::ecs::SystemType::PreUpdate);
+}
+
+TEST_F(TestingSystemPlugins, RemovePlugedSystem)
+{
+    ASSERT_EQ(1, _sysMgr.size());
+    ASSERT_EQ(1, _sysMgr.nbPlugins());
+    _sysMgr.getSystem<sfme::testing::plugins::FooSystem>().mark();
+    ASSERT_TRUE(_sysMgr.markSystem<sfme::testing::plugins::FooSystem>());
+    ASSERT_EQ(0, _sysMgr.nbPlugins());
+    _sysMgr.update();
+    ASSERT_EQ(0, _sysMgr.size());
 }

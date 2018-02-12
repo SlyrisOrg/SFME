@@ -114,6 +114,11 @@ namespace sfme::ecs
             return _systems.at(sysType).size();
         }
 
+        size_t nbPlugins() const noexcept
+        {
+            return _libMemoisation.size();
+        }
+
         template <typename System>
         const System &getSystem() const noexcept
         {
@@ -176,6 +181,8 @@ namespace sfme::ecs
             if (hasSystem<System>()) {
                 getSystem<System>().mark();
                 _needToSweep = true;
+                if constexpr (System::is_plugged_system_v)
+                    _libMemoisation.erase(System::className());
                 return true;
             }
             _needToSweep = false;

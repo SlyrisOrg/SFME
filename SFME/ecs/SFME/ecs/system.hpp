@@ -9,21 +9,6 @@
 
 namespace sfme::ecs
 {
-    using PluginSystem = struct PluginSystemTag;
-    using NoPluginSystem = struct NoPluginSystemTag;
-
-    namespace details
-    {
-        template <typename isPlugin>
-        static constexpr bool is_plugged_system_v() noexcept
-        {
-            if constexpr (std::is_same_v<isPlugin, PluginSystem>)
-                return true;
-            else
-                return false;
-        }
-    }
-
     template <typename SystemDerived, typename KindSystem, typename isPlugin>
     class System : public BaseSystem
     {
@@ -62,20 +47,20 @@ namespace sfme::ecs
     };
 
     template <typename SystemDerived>
-    using LogicUpdateSystem = System<SystemDerived, TLogicUpdate, NoPluginSystem>;
+    using LogicUpdateSystem = System<SystemDerived, TLogicUpdate, details::NoPluginSystem>;
 
     template <typename SystemDerived>
-    using PreUpdateSystem = System<SystemDerived, TPreUpdate, NoPluginSystem>;
+    using PreUpdateSystem = System<SystemDerived, TPreUpdate, details::NoPluginSystem>;
 
     template <typename SystemDerived>
-    using PostUpdateSystem = System<SystemDerived, TPostUpdate, NoPluginSystem>;
+    using PostUpdateSystem = System<SystemDerived, TPostUpdate, details::NoPluginSystem>;
 
     template <typename SystemDerived>
-    using PlugLogicUpdateSystem = System<SystemDerived, TLogicUpdate, PluginSystem>;
+    using PlugLogicUpdateSystem = System<SystemDerived, TLogicUpdate, details::PluginSystem>;
 
     template <typename SystemDerived>
-    using PlugPreUpdateSystem = System<SystemDerived, TPreUpdate, PluginSystem>;
+    using PlugPreUpdateSystem = System<SystemDerived, TPreUpdate, details::PluginSystem>;
 
     template <typename SystemDerived>
-    using PlugPostUpdateSystem = System<SystemDerived, TPostUpdate, PluginSystem>;
+    using PlugPostUpdateSystem = System<SystemDerived, TPostUpdate, details::PluginSystem>;
 }
