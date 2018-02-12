@@ -6,9 +6,11 @@
 
 #include <memory>
 #include <cassert>
+#include <core/lib/Lib.hpp>
 #include <SFME/timer/timer.hpp>
 #include <SFME/mediator/common_events.hpp>
 #include <SFME/ecs/system_base.hpp>
+#include <SFME/ecs/system.hpp>
 #include <SFME/ecs/system_type.hpp>
 #include <SFME/ecs/details/system_type_traits.hpp>
 
@@ -17,6 +19,8 @@ namespace sfme::ecs
     template <typename EntityManager>
     class SystemManager final : public sfme::mediator::Receiver<SystemManager<EntityManager>>
     {
+    public:
+        using CreatorFunc = std::shared_ptr<BaseSystem> (*)(sfme::mediator::EventManager &, EntityManager &);
     private:
         //! Typedefs
         using SystemPtr = std::shared_ptr<BaseSystem>;
@@ -24,8 +28,11 @@ namespace sfme::ecs
         using SystemArray = std::array<SystemMap, SystemType::Size>;
     public:
         //! Constructor
-        SystemManager(sfme::mediator::EventManager &evtMgr, EntityManager &ettMgr) noexcept : _evtMgr(evtMgr),
-                                                                                              _ettMgr(ettMgr)
+        SystemManager(sfme::mediator::EventManager &evtMgr, EntityManager &ettMgr,
+                      fs::path pluginPath = fs::current_path() / fs::path("plugins")) noexcept :
+            _evtMgr(evtMgr),
+            _ettMgr(ettMgr),
+            _pluginPath(std::move(pluginPath))
         {
             _evtMgr.subscribe<sfme::mediator::evt::GameStarted>(*this);
         }
@@ -75,6 +82,25 @@ namespace sfme::ecs
             (createSystem<Systems>(), ...);
         }
 
+        template <typename System>
+        bool loadPlugin(std::string pluginName, std::string &&creatorFunc = "createSystem") noexcept
+        {
+            try {
+                auto &&creator = _plugins.emplace_back(lib::getSymbol<CreatorFunc>(_pluginPath / fs::path(pluginName),
+                                                                                   creatorFunc,
+                                                                                   lib::LoadingMode::Default));
+                auto ptr = (*creator)(_evtMgr, _ettMgr);
+                _libMemoisation[System::className()] = ptr->getType();
+                _systems[System::getSystemType()].emplace(ptr->getType(),
+                                                          ptr).first->second;
+            }
+            catch (const std::exception &error) {
+                std::cerr << error.what() << std::endl;
+                return false;
+            }
+            return true;
+        }
+
         size_t size() const noexcept
         {
             return _systems.at(SystemType::PreUpdate).size() +
@@ -93,7 +119,11 @@ namespace sfme::ecs
         {
             static_assert(details::is_system_v<System>,
                           "The System type given as template parameter doesn't seems to be valid");
-            return static_cast<System &>(*_systems.at(System::getSystemType()).at(details::generateID<System>()));
+            if constexpr (System::is_plugged_system_v)
+                return static_cast<System &>(*_systems.at(System::getSystemType()).at(
+                    _libMemoisation.at(System::className())));
+            else
+                return static_cast<System &>(*_systems.at(System::getSystemType()).at(details::generateID<System>()));
         }
 
         template <typename System>
@@ -101,7 +131,11 @@ namespace sfme::ecs
         {
             static_assert(details::is_system_v<System>,
                           "The System type given as template parameter doesn't seems to be valid");
-            return static_cast<System &>(*_systems[System::getSystemType()].at(details::generateID<System>()));
+            if constexpr (System::is_plugged_system_v)
+                return static_cast<System &>(*_systems.at(System::getSystemType()).at(
+                    _libMemoisation.at(System::className())));
+            else
+                return static_cast<System &>(*_systems.at(System::getSystemType()).at(details::generateID<System>()));
         }
 
         template <typename ...Systems>
@@ -122,7 +156,10 @@ namespace sfme::ecs
             static_assert(details::is_system_v<System>,
                           "The System type given as template parameter doesn't seems to be valid");
             auto &&curSystems = _systems[System::getSystemType()];
-            return curSystems.find(details::generateID<System>()) != curSystems.end();
+            if constexpr (System::is_plugged_system_v)
+                return curSystems.find(_libMemoisation.at(System::className())) != curSystems.end();
+            else
+                return curSystems.find(details::generateID<System>()) != curSystems.end();
         }
 
         template <typename ... Systems>
@@ -175,9 +212,12 @@ namespace sfme::ecs
     private:
         //! Private members
         bool _needToSweep{false};
+        std::vector<lib::Symbol<CreatorFunc>> _plugins;
+        std::unordered_map<std::string, typeID> _libMemoisation;
         timer::TimeStep _timeStep;
         sfme::mediator::EventManager &_evtMgr;
         EntityManager &_ettMgr;
         SystemArray _systems{{}};
+        fs::path _pluginPath;
     };
 }

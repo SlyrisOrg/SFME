@@ -5,17 +5,35 @@
 #pragma once
 
 #include <SFME/ecs/system_base.hpp>
+#include <SFME/ecs/details/system_type_traits.hpp>
 
 namespace sfme::ecs
 {
-    template <typename SystemDerived, typename KindSystem>
+    using PluginSystem = struct PluginSystemTag;
+    using NoPluginSystem = struct NoPluginSystemTag;
+
+    namespace details
+    {
+        template <typename isPlugin>
+        static constexpr bool is_plugged_system_v() noexcept
+        {
+            if constexpr (std::is_same_v<isPlugin, PluginSystem>)
+                return true;
+            else
+                return false;
+        }
+    }
+
+    template <typename SystemDerived, typename KindSystem, typename isPlugin>
     class System : public BaseSystem
     {
     private:
         template <typename T>
         using is_kind_system = std::is_same<KindSystem, T>;
-    public:
 
+    public:
+        static constexpr bool is_plugged_system_v = details::is_plugged_system_v<isPlugin>();
+    public:
         template <typename ...Args>
         explicit System(Args &&...args) noexcept : BaseSystem(std::forward<Args>(args)...)
         {
@@ -44,11 +62,20 @@ namespace sfme::ecs
     };
 
     template <typename SystemDerived>
-    using LogicUpdateSystem = System<SystemDerived, TLogicUpdate>;
+    using LogicUpdateSystem = System<SystemDerived, TLogicUpdate, NoPluginSystem>;
 
     template <typename SystemDerived>
-    using PreUpdateSystem = System<SystemDerived, TPreUpdate>;
+    using PreUpdateSystem = System<SystemDerived, TPreUpdate, NoPluginSystem>;
 
     template <typename SystemDerived>
-    using PostUpdateSystem = System<SystemDerived, TPostUpdate>;
+    using PostUpdateSystem = System<SystemDerived, TPostUpdate, NoPluginSystem>;
+
+    template <typename SystemDerived>
+    using PlugLogicUpdateSystem = System<SystemDerived, TLogicUpdate, PluginSystem>;
+
+    template <typename SystemDerived>
+    using PlugPreUpdateSystem = System<SystemDerived, TPreUpdate, PluginSystem>;
+
+    template <typename SystemDerived>
+    using PlugPostUpdateSystem = System<SystemDerived, TPostUpdate, PluginSystem>;
 }
