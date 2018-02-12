@@ -7,12 +7,12 @@
 #include <typeindex>
 #include "common_ecs_test.hpp"
 
-struct TestSystem : public sfme::ecs::System<TestSystem>
+struct TestSystem : public sfme::ecs::PreUpdateSystem<TestSystem>
 {
     reflect_class(TestSystem);
 
     TestSystem(sfme::mediator::EventManager &evtMgr, sfme::testing::EntityManager &ettMgr) noexcept :
-        System<TestSystem>(evtMgr),
+        System(evtMgr),
         _ettMgr(ettMgr)
     {
     }
@@ -21,22 +21,17 @@ struct TestSystem : public sfme::ecs::System<TestSystem>
     {
     }
 
-    static constexpr sfme::ecs::SystemType getSystemType() noexcept
-    {
-        return sfme::ecs::SystemType::PreUpdate;
-    }
-
     ~TestSystem() noexcept override = default;
 
     sfme::testing::EntityManager &_ettMgr;
 };
 
-struct LogicalSystem : public sfme::ecs::System<LogicalSystem>
+struct LogicalSystem : public sfme::ecs::LogicUpdateSystem<LogicalSystem>
 {
     reflect_class(LogicalSystem);
 
     LogicalSystem(sfme::mediator::EventManager &evtMgr, sfme::testing::EntityManager &ettMgr) noexcept :
-        System<LogicalSystem>(evtMgr),
+        System(evtMgr),
         _ettMgr(ettMgr)
     {
     }
@@ -46,22 +41,17 @@ struct LogicalSystem : public sfme::ecs::System<LogicalSystem>
         std::cout << __FUNCTION__ << std::endl;
     }
 
-    static constexpr sfme::ecs::SystemType getSystemType() noexcept
-    {
-        return sfme::ecs::SystemType::LogicUpdate;
-    }
-
     ~LogicalSystem() noexcept override = default;
 
     sfme::testing::EntityManager &_ettMgr;
 };
 
-struct PostSystem : public sfme::ecs::System<PostSystem>
+struct PostSystem : public sfme::ecs::PostUpdateSystem<PostSystem>
 {
     reflect_class(PostSystem);
 
     PostSystem(sfme::mediator::EventManager &evtMgr, sfme::testing::EntityManager &ettMgr) noexcept :
-        System<PostSystem>(evtMgr),
+        System(evtMgr),
         _ettMgr(ettMgr)
     {
     }
@@ -70,32 +60,22 @@ struct PostSystem : public sfme::ecs::System<PostSystem>
     {
     }
 
-    static constexpr sfme::ecs::SystemType getSystemType() noexcept
-    {
-        return sfme::ecs::SystemType::PostUpdate;
-    }
-
     ~PostSystem() noexcept override = default;
     sfme::testing::EntityManager &_ettMgr;
 };
 
-struct SecondTestSystem : public sfme::ecs::System<SecondTestSystem>
+struct SecondTestSystem : public sfme::ecs::PreUpdateSystem<SecondTestSystem>
 {
     reflect_class(SecondTestSystem);
 
     SecondTestSystem(sfme::mediator::EventManager &evtMgr, sfme::testing::EntityManager &ettMgr) noexcept
-        : System<SecondTestSystem>(evtMgr),
+        : System(evtMgr),
           _ettMgr(ettMgr)
     {
     }
 
     void update() noexcept override
     {
-    }
-
-    static constexpr sfme::ecs::SystemType getSystemType() noexcept
-    {
-        return sfme::ecs::SystemType::PreUpdate;
     }
 
     ~SecondTestSystem() noexcept override = default;
@@ -254,8 +234,7 @@ TEST_F(TestingSystem, MarkSystemsFold)
 TEST_F(TestingSystem, GetSystems)
 {
     _sysMgr.loadSystems<LogicalSystem, SecondTestSystem, TestSystem>();
-    const auto &
-    [logical, second, test] = _sysMgr.getSystems<LogicalSystem, SecondTestSystem, TestSystem>();
+    const auto &[logical, second, test] = _sysMgr.getSystems<LogicalSystem, SecondTestSystem, TestSystem>();
     ASSERT_EQ(std::decay_t<decltype(logical)>::getSystemType(), sfme::ecs::SystemType::LogicUpdate);
     ASSERT_EQ(std::decay_t<decltype(second)>::getSystemType(), sfme::ecs::SystemType::PreUpdate);
     ASSERT_EQ(std::decay_t<decltype(test)>::getSystemType(), sfme::ecs::SystemType::PreUpdate);

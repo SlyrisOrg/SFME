@@ -149,7 +149,7 @@ namespace sfme::ecs
         using AllocatorsTuple = typename Entity::AllocatorsTuple;
 
     private:
-        EntityID __nextID() noexcept
+        EntityID _nextID() noexcept
         {
             static EntityID curID{0};
 
@@ -159,7 +159,7 @@ namespace sfme::ecs
     public:
         EntityID createEntity() noexcept
         {
-            return createEntity(__nextID());
+            return createEntity(_nextID());
         }
 
         EntityID createEntity(EntityID id) noexcept
