@@ -40,8 +40,24 @@ namespace sfme::ecs
             return _marked;
         }
 
+        void enable() noexcept
+        {
+            _enable = true;
+        }
+
+        void disable() noexcept
+        {
+            _enable = false;
+        }
+
+        bool isEnabled() const noexcept
+        {
+            return _enable;
+        }
+
     protected:
         mediator::EventManager &_evtMgr;
         bool _marked{false};
+        bool _enable{true};
     };
 }

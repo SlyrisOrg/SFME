@@ -192,6 +192,45 @@ TEST_F(TestingSystem, RemoveSystem)
     ASSERT_EQ(3, _sysMgr.size());
 }
 
+TEST_F(TestingSystem, DisableSingleSystem)
+{
+    _sysMgr.loadSystems<PostSystem, SecondTestSystem, TestSystem>();
+    ASSERT_EQ(3, _sysMgr.update());
+    ASSERT_TRUE(_sysMgr.disableSystem<PostSystem>());
+    ASSERT_EQ(2, _sysMgr.update());
+}
+
+TEST_F(TestingSystem, EnableSingleSystem)
+{
+    _sysMgr.loadSystems<PostSystem, SecondTestSystem, TestSystem>();
+    ASSERT_EQ(3, _sysMgr.update());
+    ASSERT_TRUE(_sysMgr.disableSystem<PostSystem>());
+    ASSERT_EQ(2, _sysMgr.update());
+    ASSERT_TRUE(_sysMgr.enableSystem<PostSystem>());
+    ASSERT_EQ(3, _sysMgr.update());
+}
+
+TEST_F(TestingSystem, DisableMultipleSystems)
+{
+    _sysMgr.loadSystems<PostSystem, SecondTestSystem, TestSystem>();
+    ASSERT_EQ(3, _sysMgr.update());
+    bool res = _sysMgr.disableSystems<PostSystem, SecondTestSystem, TestSystem>();
+    ASSERT_TRUE(res);
+    ASSERT_EQ(0, _sysMgr.update());
+}
+
+TEST_F(TestingSystem, EnableMultipleSystems)
+{
+    _sysMgr.loadSystems<PostSystem, SecondTestSystem, TestSystem>();
+    ASSERT_EQ(3, _sysMgr.update());
+    bool res = _sysMgr.disableSystems<PostSystem, SecondTestSystem, TestSystem>();
+    ASSERT_TRUE(res);
+    ASSERT_EQ(0, _sysMgr.update());
+    res = _sysMgr.enableSystems<PostSystem, SecondTestSystem, TestSystem>();
+    ASSERT_TRUE(res);
+    ASSERT_EQ(3, _sysMgr.update());
+}
+
 TEST_F(TestingSystem, RemoveSystemDuplicata)
 {
     _sysMgr.loadSystems<PostSystem, LogicalSystem, SecondTestSystem, TestSystem>();
@@ -276,6 +315,7 @@ TEST_F(TestingSystemPlugins, RemovePlugedSystem)
     _sysMgr.getSystem<sfme::testing::plugins::FooSystem>().mark();
     ASSERT_TRUE(_sysMgr.markSystem<sfme::testing::plugins::FooSystem>());
     ASSERT_EQ(0, _sysMgr.nbPlugins());
-    _sysMgr.update();
+    ASSERT_EQ(1, _sysMgr.update());
     ASSERT_EQ(0, _sysMgr.size());
+    ASSERT_EQ(0, _sysMgr.update());
 }

@@ -7,7 +7,6 @@
 
 namespace sfme::example::plugins
 {
-
     void FooSystem::update() noexcept
     {
         (void)_ettMgr;
@@ -27,6 +26,7 @@ namespace sfme::example::plugins
         std::cout << __FUNCTION__ << std::endl;
         return std::make_shared<FooSystem>(evtMgr, ettMgr);
     }
+
     lib_alias_function(FooSystem::createSystem, createSystem);
 }
 

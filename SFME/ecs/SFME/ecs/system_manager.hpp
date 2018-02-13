@@ -46,11 +46,16 @@ namespace sfme::ecs
 
     public:
         //! Public member functions
-        void update() noexcept
+        size_t update() noexcept
         {
-            auto updateSystem = [this](SystemType sysType) noexcept {
+            size_t nbSystemsUpdated = 0;
+            auto updateSystem = [this, &nbSystemsUpdated](SystemType sysType) noexcept {
                 for (auto &&curSystem : _systems[sysType]) {
-                    curSystem.second->update();
+                    auto &&system = curSystem.second;
+                    if (system->isEnabled()) {
+                        system->update();
+                        nbSystemsUpdated++;
+                    }
                 }
             };
 
@@ -63,6 +68,7 @@ namespace sfme::ecs
             updateSystem(SystemType::PostUpdate);
             if (_needToSweep)
                 sweepSystems();
+            return nbSystemsUpdated;
         }
 
         template <typename System, typename ...Args>
@@ -85,6 +91,8 @@ namespace sfme::ecs
         template <typename System>
         bool loadPlugin(std::string pluginName, std::string &&creatorFunc = "createSystem") noexcept
         {
+            static_assert(details::is_system_v<System>,
+                          "The System type given as template parameter doesn't seems to be valid");
             try {
                 auto &&creator = _plugins.emplace_back(lib::getSymbol<CreatorFunc>(_pluginPath / fs::path(pluginName),
                                                                                    creatorFunc,
@@ -117,6 +125,42 @@ namespace sfme::ecs
         size_t nbPlugins() const noexcept
         {
             return _libMemoisation.size();
+        }
+
+        template <typename System>
+        bool disableSystem() noexcept
+        {
+            static_assert(details::is_system_v<System>,
+                          "The System type given as template parameter doesn't seems to be valid");
+            if (hasSystem<System>()) {
+                getSystem<System>().disable();
+                return true;
+            }
+            return false;
+        }
+
+        template <typename ... Systems>
+        bool disableSystems() noexcept
+        {
+            return (disableSystem<Systems>() && ...);
+        }
+
+        template <typename System>
+        bool enableSystem() noexcept
+        {
+            static_assert(details::is_system_v<System>,
+                          "The System type given as template parameter doesn't seems to be valid");
+            if (hasSystem<System>()) {
+                getSystem<System>().enable();
+                return true;
+            }
+            return false;
+        }
+
+        template <typename ... Systems>
+        bool enableSystems() noexcept
+        {
+            return (enableSystem<Systems>() && ...);
         }
 
         template <typename System>

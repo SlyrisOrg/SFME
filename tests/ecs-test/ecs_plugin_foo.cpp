@@ -27,4 +27,3 @@ namespace sfme::testing::plugins
 
     lib_alias_function(FooSystem::createSystem, createSystem);
 }
-
