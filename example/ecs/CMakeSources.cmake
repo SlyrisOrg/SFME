@@ -1,3 +1,4 @@
 set(SFME_ECS_SYSTEM_ADD_EXAMPLE_SOURCES ecs_system_create_system.cpp ecs_common_example.hpp)
 set(SFME_ECS_SYSTEM_UPDATE_EXAMPLE_SOURCES ecs_system_update_system.cpp ecs_common_example.hpp)
 set(SFME_ECS_PLUGINS_FOO_EXAMPLE_SOURCES ecs_plugin_foo.cpp ecs_plugin_foo.hpp)
+set(SFME_ECS_PLUGINS_BAR_EXAMPLE_SOURCES ecs_plugin_bar.cpp ecs_plugin_bar.hpp)

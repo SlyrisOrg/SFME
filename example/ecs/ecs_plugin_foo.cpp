@@ -17,7 +17,6 @@ namespace sfme::example::plugins
         System(evtMgr),
         _ettMgr(ettMgr)
     {
-        std::cout << __FUNCTION__ << std::endl;
     }
 
     std::shared_ptr<sfme::ecs::BaseSystem>

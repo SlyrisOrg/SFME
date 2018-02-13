@@ -23,7 +23,8 @@ namespace sfme::ecs
     public:
         virtual void update() noexcept = 0;
         virtual typeID getType() const noexcept = 0;
-
+        virtual const std::string& getName() const noexcept = 0;
+        virtual SystemType getSystemTypeRTTI() const noexcept = 0;
     public:
         void mark() noexcept
         {

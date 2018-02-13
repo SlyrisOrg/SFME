@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <memory>
 #include <cassert>
 #include <core/lib/Lib.hpp>
@@ -29,11 +30,14 @@ namespace sfme::ecs
     public:
         //! Constructor
         SystemManager(sfme::mediator::EventManager &evtMgr, EntityManager &ettMgr,
-                      fs::path pluginPath = fs::current_path() / fs::path("plugins")) noexcept :
+                      fs::path pluginPath = fs::current_path() / fs::path("systems")) noexcept :
             _evtMgr(evtMgr),
             _ettMgr(ettMgr),
             _pluginPath(std::move(pluginPath))
         {
+#ifdef SILENT_SYSTEMS_MANAGER_LOGGING
+            _log.setLevel(logging::Silent);
+#endif
             _evtMgr.subscribe<sfme::mediator::evt::GameStarted>(*this);
         }
 
@@ -66,8 +70,9 @@ namespace sfme::ecs
                 _timeStep.performUpdate();
             }
             updateSystem(SystemType::PostUpdate);
-            if (_needToSweep)
-                sweepSystems();
+            if (_needToSweepSystems)
+                _sweepSystems();
+            _ettMgr.sweepEntities();
             return nbSystemsUpdated;
         }
 
@@ -78,8 +83,8 @@ namespace sfme::ecs
                           "The System type given as template parameter doesn't seems to be valid");
             if (hasSystem<System>())
                 return getSystem<System>();
-            return static_cast<System &>(addSystem<System>(std::make_shared<System>(_evtMgr, _ettMgr,
-                                                                                    std::forward<Args>(args)...)));
+            return static_cast<System &>(_addSystem<System>(std::make_shared<System>(_evtMgr, _ettMgr,
+                                                                                     std::forward<Args>(args)...)));
         }
 
         template <typename ...Systems>
@@ -88,25 +93,47 @@ namespace sfme::ecs
             (createSystem<Systems>(), ...);
         }
 
-        template <typename System>
         bool loadPlugin(std::string pluginName, std::string &&creatorFunc = "createSystem") noexcept
         {
-            static_assert(details::is_system_v<System>,
-                          "The System type given as template parameter doesn't seems to be valid");
             try {
                 auto &&creator = _plugins.emplace_back(lib::getSymbol<CreatorFunc>(_pluginPath / fs::path(pluginName),
                                                                                    creatorFunc,
                                                                                    lib::LoadingMode::Default));
                 auto ptr = (*creator)(_evtMgr, _ettMgr);
-                _libMemoisation[System::className()] = ptr->getType();
-                _systems[System::getSystemType()].emplace(ptr->getType(),
-                                                          ptr).first->second;
+                if (std::any_of(begin(_libMemoisation), end(_libMemoisation), [&ptr](auto &&id) {
+                    return ptr->getType() == id.second;
+                })) {
+                    _log(logging::Info) << pluginName << " system already loaded" << std::endl;
+                    return true;
+                }
+                _libMemoisation[ptr->getName()] = ptr->getType();
+                _systems[ptr->getSystemTypeRTTI()].emplace(ptr->getType(),
+                                                           ptr).first->second;
+                _log(logging::Debug) << pluginName << " has been successfully loaded." << std::endl;
             }
             catch (const std::exception &error) {
-                std::cerr << error.what() << std::endl;
+                _log(logging::Debug) << error.what() << std::endl;
                 return false;
             }
             return true;
+        }
+
+        bool loadPlugins(std::string &&creatorFunc = "createSystem")
+        {
+            bool res = true;
+            fs::recursive_directory_iterator endit;
+            for (fs::recursive_directory_iterator it(_pluginPath); it != endit; ++it) {
+                if (!fs::is_regular_file(*it)) {
+                    continue;
+                }
+                res &= loadPlugin(it->path().filename().string(), std::move(creatorFunc));
+            }
+            return res;
+        }
+
+        void setPluginPath(fs::path pluginPath) noexcept
+        {
+            _pluginPath = std::move(pluginPath);
         }
 
         size_t size() const noexcept
@@ -134,6 +161,7 @@ namespace sfme::ecs
                           "The System type given as template parameter doesn't seems to be valid");
             if (hasSystem<System>()) {
                 getSystem<System>().disable();
+                _log(logging::Debug) << System::className() << " has been disabled" << std::endl;
                 return true;
             }
             return false;
@@ -152,6 +180,7 @@ namespace sfme::ecs
                           "The System type given as template parameter doesn't seems to be valid");
             if (hasSystem<System>()) {
                 getSystem<System>().enable();
+                _log(logging::Debug) << System::className() << " has been enabled" << std::endl;
                 return true;
             }
             return false;
@@ -224,12 +253,13 @@ namespace sfme::ecs
                           "The System type given as template parameter doesn't seems to be valid");
             if (hasSystem<System>()) {
                 getSystem<System>().mark();
-                _needToSweep = true;
+                _needToSweepSystems = true;
                 if constexpr (System::is_plugged_system_v)
                     _libMemoisation.erase(System::className());
+                _log(logging::Debug) << System::className() << " has been marked" << std::endl;
                 return true;
             }
-            _needToSweep = false;
+            _needToSweepSystems = false;
             return false;
         }
 
@@ -241,28 +271,30 @@ namespace sfme::ecs
 
     private:
         template <typename System>
-        BaseSystem &addSystem(SystemPtr system) noexcept
+        BaseSystem &_addSystem(SystemPtr system) noexcept
         {
             return *_systems[System::getSystemType()].emplace(details::generateID<System>(), system).first->second;
         }
 
-        void sweepSystems() noexcept
+        void _sweepSystems() noexcept
         {
             for (auto &&curSystem : _systems) {
                 for (auto it = curSystem.begin(); it != curSystem.end();) {
                     if (it->second->isMarked()) {
+                        _log(logging::Debug) << it->second->getName() << " has been removed" << std::endl;
                         it = curSystem.erase(it);
                     } else {
                         ++it;
                     }
                 }
             }
-            _needToSweep = false;
+            _needToSweepSystems = false;
         }
 
     private:
         //! Private members
-        bool _needToSweep{false};
+        logging::Logger _log{"system_manager", logging::Debug};
+        bool _needToSweepSystems{false};
         std::vector<lib::Symbol<CreatorFunc>> _plugins;
         std::unordered_map<std::string, typeID> _libMemoisation;
         timer::TimeStep _timeStep;

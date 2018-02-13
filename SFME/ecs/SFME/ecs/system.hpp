@@ -44,6 +44,16 @@ namespace sfme::ecs
         {
             return details::generateID<SystemDerived>();
         }
+        
+        SystemType getSystemTypeRTTI() const noexcept final
+        {
+            return System::getSystemType();
+        }
+
+        const std::string& getName() const noexcept final
+        {
+            return SystemDerived::className();
+        }
     };
 
     template <typename SystemDerived>

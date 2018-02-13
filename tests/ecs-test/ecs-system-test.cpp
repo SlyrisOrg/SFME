@@ -100,7 +100,7 @@ class TestingSystemPlugins : public sfme::ecs::World<sfme::testing::Components>,
 protected:
     void SetUp() override
     {
-        ASSERT_TRUE(_sysMgr.loadPlugin<sfme::testing::plugins::FooSystem>("ecs-plugin-foo"));
+        ASSERT_TRUE(_sysMgr.loadPlugin("ecs-plugin-foo"));
     }
 
     void TearDown() override

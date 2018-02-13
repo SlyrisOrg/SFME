@@ -19,16 +19,17 @@ macro(create_ecs_plugins EXECUTABLE SOURCES)
     target_link_libraries(${EXECUTABLE} SFME::ECS)
     set_target_properties(${EXECUTABLE}
             PROPERTIES
-            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/plugins"
-            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/plugins"
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/plugins"
-            LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/bin/plugins"
-            LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/plugins"
-            RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/bin/plugins"
-            RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/plugins")
+            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/systems"
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/systems"
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/systems"
+            LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/bin/systems"
+            LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/systems"
+            RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/bin/systems"
+            RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/systems")
 endmacro()
 
 create_ecs_example(sfme_ecs_system_create_example "${SFME_ECS_SYSTEM_ADD_EXAMPLE_SOURCES}")
 create_ecs_example(sfme_ecs_system_update_example "${SFME_ECS_SYSTEM_UPDATE_EXAMPLE_SOURCES}")
 create_ecs_plugins(sfme_ecs_foo_plugin_example "${SFME_ECS_PLUGINS_FOO_EXAMPLE_SOURCES}")
-add_dependencies(sfme_ecs_system_create_example sfme_ecs_foo_plugin_example)
+create_ecs_plugins(sfme_ecs_bar_plugin_example "${SFME_ECS_PLUGINS_BAR_EXAMPLE_SOURCES}")
+add_dependencies(sfme_ecs_system_create_example sfme_ecs_foo_plugin_example sfme_ecs_bar_plugin_example)
