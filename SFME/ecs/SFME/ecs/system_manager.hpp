@@ -15,6 +15,7 @@
 #include <SFME/ecs/system.hpp>
 #include <SFME/ecs/system_type.hpp>
 #include <SFME/ecs/details/system_type_traits.hpp>
+#include <SFME/ecs/details/utils.hpp>
 
 namespace sfme::ecs
 {
@@ -123,11 +124,15 @@ namespace sfme::ecs
         {
             bool res = true;
             fs::recursive_directory_iterator endit;
+
             for (fs::recursive_directory_iterator it(_pluginPath); it != endit; ++it) {
                 if (!fs::is_regular_file(*it)) {
                     continue;
                 }
-                res &= loadPlugin(it->path().filename().string(), std::move(creatorFunc));
+				if (details::is_shared_library(it->path())) {
+					res &= loadPlugin(it->path().filename().string(), std::move(creatorFunc));
+				}
+
             }
             return res;
         }
