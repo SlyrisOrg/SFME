@@ -1,3 +1,3 @@
 [submodule "vendor/core-v2"]
 	path = vendor/core-v2
-	url = https://github.com/SlyrisOrg/core-v2
+	url = https://github.com/SlyrisOrg/core-v2.git
