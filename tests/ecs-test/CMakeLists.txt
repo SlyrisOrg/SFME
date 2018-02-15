@@ -20,5 +20,6 @@ endmacro()
 
 generate_local_test(ecs-system-test.cpp ecs-system-test)
 generate_local_plugin("ecs_plugin_foo.hpp;ecs_plugin_foo.cpp" ecs-plugin-foo)
-add_dependencies(ecs-system-test ecs-plugin-foo)
+generate_local_plugin("ecs_plugin_bar.hpp;ecs_plugin_bar.cpp" ecs-plugin-bar)
+add_dependencies(ecs-system-test ecs-plugin-foo ecs-plugin-bar)
 target_compile_definitions(ecs-system-test PRIVATE -DSILENT_SYSTEMS_MANAGER_LOGGING)

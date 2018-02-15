@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <core/meta/List.hpp>
 #include <core/meta/TupleForEach.hpp>
+#include <core/algorithm/erase_if.hpp>
 
 namespace sfme::ecs
 {
@@ -190,15 +191,9 @@ namespace sfme::ecs
             }
         }
 
-        void sweepEntities()
+        void sweepEntities() noexcept
         {
-            for (auto it = _entities.begin(); it != _entities.end();) {
-                if (it->second.isMarked()) {
-                    it = _entities.erase(it);
-                } else {
-                    ++it;
-                }
-            }
+            algo::erase_if(_entities, [](auto &&pair) { return pair.second.isMarked(); });
         }
 
         void clear() noexcept

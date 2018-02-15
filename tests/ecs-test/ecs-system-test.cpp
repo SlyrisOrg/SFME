@@ -108,6 +108,19 @@ protected:
     }
 };
 
+class TestingSystemMultiplePlugins : public sfme::ecs::World<sfme::testing::Components>, public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        ASSERT_TRUE(_sysMgr.loadPlugins());
+    }
+
+    void TearDown() override
+    {
+    }
+};
+
 TEST_F(TestingSystem, AddSystem)
 {
     _sysMgr.createSystem<TestSystem>();
@@ -318,4 +331,10 @@ TEST_F(TestingSystemPlugins, RemovePlugedSystem)
     ASSERT_EQ(1, _sysMgr.update());
     ASSERT_EQ(0, _sysMgr.size());
     ASSERT_EQ(0, _sysMgr.update());
+}
+
+TEST_F(TestingSystemMultiplePlugins, Basics)
+{
+    ASSERT_EQ(2, _sysMgr.size());
+    ASSERT_EQ(2, _sysMgr.nbPlugins());
 }

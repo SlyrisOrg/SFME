@@ -8,6 +8,7 @@
 #include <memory>
 #include <cassert>
 #include <core/lib/Lib.hpp>
+#include <core/algorithm/erase_if.hpp>
 #include <SFME/timer/timer.hpp>
 #include <SFME/mediator/common_events.hpp>
 #include <SFME/ecs/system_base.hpp>
@@ -279,14 +280,9 @@ namespace sfme::ecs
         void _sweepSystems() noexcept
         {
             for (auto &&curSystem : _systems) {
-                for (auto it = curSystem.begin(); it != curSystem.end();) {
-                    if (it->second->isMarked()) {
-                        _log(logging::Debug) << it->second->getName() << " has been removed" << std::endl;
-                        it = curSystem.erase(it);
-                    } else {
-                        ++it;
-                    }
-                }
+                algo::erase_if(curSystem, [](auto &&pair) {
+                    return pair.second->isMarked();
+                });
             }
             _needToSweepSystems = false;
         }
