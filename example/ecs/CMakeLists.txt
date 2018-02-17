@@ -28,6 +28,7 @@ macro(create_ecs_plugins EXECUTABLE SOURCES)
             RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/example/systems")
 endmacro()
 
+create_ecs_example(sfme_ecs_system_enable_disable_example "${SFME_ECS_SYSTEM_ENABLE_DISABLE_EXAMPLE_SOURCES}")
 create_ecs_example(sfme_ecs_system_create_example "${SFME_ECS_SYSTEM_ADD_EXAMPLE_SOURCES}")
 create_ecs_example(sfme_ecs_system_update_example "${SFME_ECS_SYSTEM_UPDATE_EXAMPLE_SOURCES}")
 create_ecs_plugins(sfme_ecs_foo_plugin_example "${SFME_ECS_PLUGINS_FOO_EXAMPLE_SOURCES}")
