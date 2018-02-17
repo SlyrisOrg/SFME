@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <core/meta/TupleForEach.hpp>
 #include <core/meta/List.hpp>
+#include <core/reflection/Reflection.hpp>
 
 namespace sfme::ecs::details
 {
@@ -133,6 +134,17 @@ namespace sfme::ecs::details
             std::get<pos>(_components) = nullptr;
         }
 
+        reflect_class(Entity)
+
+        static constexpr auto reflectedMembers() noexcept
+        {
+            return meta::makeMap(&Entity::_id, &Entity::_marked);
+        }
+
+        static constexpr auto reflectedFunctions() noexcept
+        {
+            return meta::makeMap(reflect_function(&Entity::getID));
+        }
     private:
         ID _id;
         AllocatorsTuple &_allocators;

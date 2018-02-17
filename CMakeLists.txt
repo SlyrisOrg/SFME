@@ -25,6 +25,7 @@ include(${SFME_MODULE_PATH}/${PROJECT_NAME}.cmake)
 
 option(SFME_BUILD_TESTS "Build tests of SFME C++ Engine" OFF)
 option(SFME_BUILD_EXAMPLES "Build the examples of SFME C++ Engine" OFF)
+option(SFME_USING_LUA_SCRIPTING "SFME Engine will use lua as langage scripting" ON)
 
 add_subdirectory(${PROJECT_NAME})
 

@@ -12,6 +12,25 @@ namespace sfme::example
     {
         struct Box
         {
+            reflect_class(Box);
+
+            int getX() const noexcept
+            {
+                return _x;
+            }
+
+            int getY() const noexcept
+            {
+                return _y;
+            }
+
+            static constexpr auto reflectedFunctions() noexcept
+            {
+                return meta::makeMap(reflect_function(&Box::getX), reflect_function(&Box::getY));
+            }
+        private:
+            int _x{0};
+            int _y{0};
         };
     }
 

@@ -1,3 +1,6 @@
 [submodule "vendor/core-v2"]
 	path = vendor/core-v2
 	url = https://github.com/SlyrisOrg/core-v2.git
+[submodule "vendor/sol2"]
+	path = vendor/sol2
+	url = https://github.com/ThePhD/sol2.git
