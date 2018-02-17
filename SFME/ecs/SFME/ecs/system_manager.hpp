@@ -95,7 +95,7 @@ namespace sfme::ecs
             (createSystem<Systems>(), ...);
         }
 
-        bool loadPlugin(std::string pluginName, std::string &&creatorFunc = "createSystem") noexcept
+        bool loadPlugin(std::string&& pluginName, std::string &&creatorFunc = "createSystem") noexcept
         {
             try {
                 auto &&creator = _plugins.emplace_back(lib::getSymbol<CreatorFunc>(_pluginPath / fs::path(pluginName),
@@ -105,7 +105,7 @@ namespace sfme::ecs
                 if (std::any_of(begin(_libMemoisation), end(_libMemoisation), [&ptr](auto &&id) {
                     return ptr->getType() == id.second;
                 })) {
-                    _log(logging::Info) << pluginName << " system already loaded" << std::endl;
+                    _log(logging::Info) << pluginName << " system already loaded." << std::endl;
                     return true;
                 }
                 _libMemoisation[ptr->getName()] = ptr->getType();
