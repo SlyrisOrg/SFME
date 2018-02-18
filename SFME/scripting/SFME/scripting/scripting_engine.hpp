@@ -4,7 +4,11 @@
 
 #pragma once
 
+#include <experimental/filesystem>
 #include <core/meta/List.hpp>
+
+namespace fs = std::experimental::filesystem;
+
 namespace sfme::scripting
 {
     template <typename GameTraits>
@@ -31,7 +35,7 @@ namespace sfme::scripting
             TScriptLang::template registerType<Type>();
         }
 
-        template<typename ...Types>
+        template <typename ...Types>
         void registerTypeList(meta::TypeList<Types...>) noexcept
         {
             (registerType<Types>(), ...);
@@ -44,6 +48,23 @@ namespace sfme::scripting
             TScriptLang::registerSystems(_systemMgr, TypeList{});
         }
 
+        template <typename ScriptComponent>
+        void loadEntitiesScript() noexcept
+        {
+            TScriptLang::template loadAllEntitiesScript<TEntity, ScriptComponent>(_ettMgr);
+        };
+
+        template<typename ReturnType = void, typename ...Args>
+        ReturnType executeGlobalFunction(const std::string &funcName, Args&& ...args) noexcept
+        {
+            return TScriptLang::template executeGlobalFunction(funcName, std::forward<Args>(args)...);
+        }
+
+        template<typename ReturnType = void, typename ...Args>
+        ReturnType executeScopedFunction(const std::string &scopName, const std::string &funcName, Args&& ...args) noexcept
+        {
+            return TScriptLang::template executeScopedFunction(scopName, funcName, std::forward<Args>(args)...);
+        }
     private:
         TEntityManager &_ettMgr;
         TSystemManager &_systemMgr;

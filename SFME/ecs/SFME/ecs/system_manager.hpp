@@ -279,6 +279,7 @@ namespace sfme::ecs
         template <typename System>
         BaseSystem &_addSystem(SystemPtr system) noexcept
         {
+            _log(logging::Debug) << "Successfully adding system: " << system->getName() << std::endl;
             return *_systems[System::getSystemType()].emplace(details::generateID<System>(), system).first->second;
         }
 
