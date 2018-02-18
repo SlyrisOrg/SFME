@@ -5,6 +5,8 @@
 #pragma once
 
 #include <SFME/ecs/ecs.hpp>
+#include <SFME/scripting/scripting_lua.hpp>
+#include <SFME/world/world.hpp>
 
 namespace sfme::example
 {
@@ -37,6 +39,8 @@ namespace sfme::example
     using Components = meta::TypeList<components::Box>;
     using EntityManager = sfme::ecs::EntityManager<Components>;
     using Entity = EntityManager::Entity;
+
+    using GameTraits = sfme::world::Traits<Components, sfme::scripting::ScriptingLua>;
 }
 
 namespace sfme::example::system

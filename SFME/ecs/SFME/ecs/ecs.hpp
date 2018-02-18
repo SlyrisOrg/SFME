@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <SFME/ecs/world.hpp>
 #include <SFME/ecs/entity_manager.hpp>
 #include <SFME/ecs/system_manager.hpp>
 #include <SFME/ecs/system_base.hpp>

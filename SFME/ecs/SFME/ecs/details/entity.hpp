@@ -136,11 +136,6 @@ namespace sfme::ecs::details
 
         reflect_class(Entity)
 
-        static constexpr auto reflectedMembers() noexcept
-        {
-            return meta::makeMap(&Entity::_id, &Entity::_marked);
-        }
-
         static constexpr auto reflectedFunctions() noexcept
         {
             return meta::makeMap(reflect_function(&Entity::getID));
@@ -150,6 +145,12 @@ namespace sfme::ecs::details
         AllocatorsTuple &_allocators;
         ComponentsPtrTuple _components;
         bool _marked{false};
+
+    public:
+        static constexpr auto reflectedMembers() noexcept
+        {
+            return meta::makeMap(reflect_member(&Entity::_id), reflect_member(&Entity::_marked));
+        }
     };
 }
 

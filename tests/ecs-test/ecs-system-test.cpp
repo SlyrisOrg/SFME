@@ -12,7 +12,9 @@ struct TestSystem : public sfme::ecs::PreUpdateSystem<TestSystem>
 {
     reflect_class(TestSystem);
 
-    TestSystem(sfme::mediator::EventManager &evtMgr, sfme::testing::EntityManager &ettMgr) noexcept :
+    using EntityManager = sfme::example::GameTraits::TEntityManager;
+
+    TestSystem(sfme::mediator::EventManager &evtMgr, EntityManager &ettMgr) noexcept :
         System(evtMgr),
         _ettMgr(ettMgr)
     {
@@ -24,14 +26,14 @@ struct TestSystem : public sfme::ecs::PreUpdateSystem<TestSystem>
 
     ~TestSystem() noexcept override = default;
 
-    sfme::testing::EntityManager &_ettMgr;
+    EntityManager &_ettMgr;
 };
 
 struct LogicalSystem : public sfme::ecs::LogicUpdateSystem<LogicalSystem>
 {
     reflect_class(LogicalSystem);
-
-    LogicalSystem(sfme::mediator::EventManager &evtMgr, sfme::testing::EntityManager &ettMgr) noexcept :
+    using EntityManager = sfme::example::GameTraits::TEntityManager;
+    LogicalSystem(sfme::mediator::EventManager &evtMgr, EntityManager &ettMgr) noexcept :
         System(evtMgr),
         _ettMgr(ettMgr)
     {
@@ -44,14 +46,15 @@ struct LogicalSystem : public sfme::ecs::LogicUpdateSystem<LogicalSystem>
 
     ~LogicalSystem() noexcept override = default;
 
-    sfme::testing::EntityManager &_ettMgr;
+    EntityManager &_ettMgr;
 };
 
 struct PostSystem : public sfme::ecs::PostUpdateSystem<PostSystem>
 {
     reflect_class(PostSystem);
 
-    PostSystem(sfme::mediator::EventManager &evtMgr, sfme::testing::EntityManager &ettMgr) noexcept :
+    using EntityManager = sfme::example::GameTraits::TEntityManager;
+    PostSystem(sfme::mediator::EventManager &evtMgr, EntityManager &ettMgr) noexcept :
         System(evtMgr),
         _ettMgr(ettMgr)
     {
@@ -62,14 +65,16 @@ struct PostSystem : public sfme::ecs::PostUpdateSystem<PostSystem>
     }
 
     ~PostSystem() noexcept override = default;
-    sfme::testing::EntityManager &_ettMgr;
+    EntityManager &_ettMgr;
 };
 
 struct SecondTestSystem : public sfme::ecs::PreUpdateSystem<SecondTestSystem>
 {
     reflect_class(SecondTestSystem);
 
-    SecondTestSystem(sfme::mediator::EventManager &evtMgr, sfme::testing::EntityManager &ettMgr) noexcept
+    using EntityManager = sfme::example::GameTraits::TEntityManager;
+
+    SecondTestSystem(sfme::mediator::EventManager &evtMgr, EntityManager &ettMgr) noexcept
         : System(evtMgr),
           _ettMgr(ettMgr)
     {
@@ -80,10 +85,10 @@ struct SecondTestSystem : public sfme::ecs::PreUpdateSystem<SecondTestSystem>
     }
 
     ~SecondTestSystem() noexcept override = default;
-    sfme::testing::EntityManager &_ettMgr;
+    EntityManager &_ettMgr;
 };
 
-class TestingSystem : public sfme::ecs::World<sfme::testing::Components>, public ::testing::Test
+class TestingSystem : public sfme::World<sfme::example::GameTraits>, public ::testing::Test
 {
 protected:
     void SetUp() override
@@ -95,7 +100,7 @@ protected:
     }
 };
 
-class TestingSystemPlugins : public sfme::ecs::World<sfme::testing::Components>, public ::testing::Test
+class TestingSystemPlugins : public sfme::World<sfme::example::GameTraits>, public ::testing::Test
 {
 protected:
     void SetUp() override
@@ -108,7 +113,7 @@ protected:
     }
 };
 
-class TestingSystemMultiplePlugins : public sfme::ecs::World<sfme::testing::Components>, public ::testing::Test
+class TestingSystemMultiplePlugins : public sfme::World<sfme::example::GameTraits>, public ::testing::Test
 {
 protected:
     void SetUp() override

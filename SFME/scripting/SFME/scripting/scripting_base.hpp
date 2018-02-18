@@ -3,5 +3,3 @@
 //
 
 #pragma once
-
-#include <SFME/world/base_world.hpp>

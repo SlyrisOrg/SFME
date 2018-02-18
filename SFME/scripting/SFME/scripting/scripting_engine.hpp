@@ -4,33 +4,48 @@
 
 #pragma once
 
-#include <SFME/scripting/scripting_lua.hpp>
-#include <SFME/ecs/system_manager.hpp>
-#include <SFME/ecs/entity_manager.hpp>
-
+#include <core/meta/List.hpp>
 namespace sfme::scripting
 {
-    template <typename Components, typename ScriptingLanguage = ScriptingLua>
-    class ScriptingEngine
+    template <typename GameTraits>
+    class ScriptingEngine : private GameTraits::TScriptingLanguage
     {
     public:
-        using ScriptLang = ScriptingLanguage;
-        using ScriptState = typename ScriptingLanguage::State;
-        using TComponents = Components;
-        using EntityManager = sfme::ecs::EntityManager<Components>;
-        using SystemManager = sfme::ecs::SystemManager<EntityManager>;
-        using Entity = typename EntityManager::Entity;
+        using TScriptLang = typename GameTraits::TScriptingLanguage;
+        using TComponents = typename GameTraits::TComponents;
+        using TEntityManager = typename GameTraits::TEntityManager;
+        using TSystemManager = typename GameTraits::TSystemManager;
+        using TEntity = typename GameTraits::TEntity;
     public:
-        ScriptingEngine(EntityManager& ettMgr, SystemManager &systemMgr) : _ettMgr(ettMgr), _systemMgr(systemMgr)
+        ScriptingEngine(TEntityManager &ettMgr, TSystemManager &systemMgr) noexcept :
+            TScriptLang(), _ettMgr(ettMgr), _systemMgr(systemMgr)
         {
-            ScriptingLanguage::openLibraries(_state);
-            ScriptingLanguage::template registerType<Entity>(_state);
-            ScriptingLanguage::registerComponents(_state, _ettMgr, Components{});
+            registerType<TEntity>();
+            TScriptLang::template registerEntityManager<TEntity>(_ettMgr);
+            TScriptLang::template registerComponents<TEntity>(TComponents{});
+        }
+
+        template <typename Type>
+        void registerType() noexcept
+        {
+            TScriptLang::template registerType<Type>();
+        }
+
+        template<typename ...Types>
+        void registerTypeList(meta::TypeList<Types...>) noexcept
+        {
+            (registerType<Types>(), ...);
+        }
+
+        template <typename TypeList>
+        void registerSystems() noexcept
+        {
+            registerTypeList(TypeList{});
+            TScriptLang::registerSystems(_systemMgr, TypeList{});
         }
 
     private:
-        ScriptState _state;
-        EntityManager& _ettMgr;
-        SystemManager& _systemMgr;
+        TEntityManager &_ettMgr;
+        TSystemManager &_systemMgr;
     };
 }

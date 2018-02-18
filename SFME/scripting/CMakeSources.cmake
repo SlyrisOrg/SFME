@@ -7,6 +7,7 @@ set(MODULE_PUBLIC_HEADERS
         "${MODULE_PATH}/scripting.hpp"
         "${MODULE_PATH}/scripting_engine.hpp"
         "${MODULE_PATH}/scripting_lua.hpp"
+        "${MODULE_PATH}/scripting_base.hpp"
         )
 
 set(MODULE_PRIVATE_HEADERS

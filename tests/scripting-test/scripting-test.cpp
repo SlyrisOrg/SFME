@@ -3,9 +3,24 @@
 //
 
 #include <gtest/gtest.h>
-#include <SFME/scripting/scripting_engine.hpp>
+#include "scripting_world_test.hpp"
+
+namespace sfme::example
+{
+    class Game : public sfme::World<GameTraits>, public testing::Test
+    {
+    protected:
+        void SetUp() override
+        {
+            _scriptingEngine.registerSystems<sfme::example::SystemList>();
+        }
+
+        void TearDown() override
+        {
+        }
+    };
+}
 
 TEST(Scripting, Basic)
 {
-
 }

@@ -12,6 +12,8 @@ namespace sfme::testing::plugins
     class BarSystem : public sfme::ecs::PlugPreUpdateSystem<BarSystem>
     {
     public:
+        using EntityManager = example::GameTraits::TEntityManager;
+    public:
         reflect_class(BarSystem);
         BarSystem(sfme::mediator::EventManager &evtMgr, EntityManager &ettMgr) noexcept;
         void update() noexcept override;

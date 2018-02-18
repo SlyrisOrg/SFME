@@ -2,7 +2,7 @@ include(CMakeSources.cmake)
 
 macro(create_ecs_example EXECUTABLE SOURCES)
     add_executable(${EXECUTABLE} "${SOURCES}")
-    target_link_libraries(${EXECUTABLE} SFME::ECS)
+    target_link_libraries(${EXECUTABLE} SFME::World)
     set_target_properties(${EXECUTABLE}
             PROPERTIES
             ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
@@ -16,7 +16,7 @@ endmacro()
 
 macro(create_ecs_plugins EXECUTABLE SOURCES)
     add_library(${EXECUTABLE} SHARED "${SOURCES}")
-    target_link_libraries(${EXECUTABLE} SFME::ECS)
+    target_link_libraries(${EXECUTABLE} SFME::World)
     set_target_properties(${EXECUTABLE}
             PROPERTIES
             ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/example/systems"

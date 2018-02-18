@@ -1,11 +1,11 @@
 //
-// Created by milerius on 11/02/18.
+// Created by sztergbaum roman on 2/17/2018.
 //
 
 #pragma once
 
 #include <core/meta/List.hpp>
-#include <SFME/world/world.hpp>
+#include <core/reflection/Reflection.hpp>
 
 namespace sfme::example
 {

@@ -12,6 +12,8 @@ namespace sfme::testing::plugins
     class FooSystem : public sfme::ecs::PlugPreUpdateSystem<FooSystem>
     {
     public:
+        using EntityManager = example::GameTraits::TEntityManager;
+    public:
         reflect_class(FooSystem);
         FooSystem(sfme::mediator::EventManager &evtMgr, EntityManager &ettMgr) noexcept;
         void update() noexcept override;

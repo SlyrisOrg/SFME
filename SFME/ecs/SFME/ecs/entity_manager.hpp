@@ -52,6 +52,16 @@ namespace sfme::ecs
             return _entities.at(id);
         }
 
+        Entity& getEntity(EntityID id) noexcept
+        {
+            return operator[](id);
+        }
+
+        const Entity& getEntityConst(EntityID id) const noexcept
+        {
+            return operator[](id);
+        }
+
         template <typename ...Types, typename PredT>
         void for_each(PredT &&pred) noexcept(noexcept(pred(std::declval<Entity &>())))
         {
@@ -76,6 +86,17 @@ namespace sfme::ecs
         size_t nbEntities() const noexcept
         {
             return _entities.size();
+        }
+
+    public:
+        static constexpr auto reflectedFunctions() noexcept
+        {
+            return meta::makeMap(reflect_function(&EntityManager::nbEntities),
+                                 reflect_function(&EntityManager::clear),
+                                 reflect_function(&EntityManager::nbEntities),
+                                 reflect_function(&EntityManager::sweepEntities),
+                                 reflect_function(&EntityManager::getEntity),
+                                 reflect_function(&EntityManager::getEntityConst));
         }
 
     private:
