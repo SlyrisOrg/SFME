@@ -14,13 +14,50 @@ namespace fs = std::experimental::filesystem;
 
 namespace sfme::scripting
 {
-    class ScriptingLua
+    class LuaSystem
     {
+    public:
+        reflect_class(LuaSystem)
+
     protected:
-        ScriptingLua(fs::path path = fs::current_path() / fs::path("lua_scripts")) noexcept :
-            _pathScriptDirectory(std::move(path))
+        LuaSystem(fs::path path = fs::current_path() / fs::path("lua_scripts")) noexcept :
+            _directoryScriptPath(path)
         {
             _state.open_libraries();
+            registerBasicFunctions();
+        }
+
+        void registerBasicFunctions() noexcept
+        {
+            _state.set_function("log_info", [this](const std::string &message)
+            {
+                this->_log(logging::Info) << message << std::endl;
+            });
+            _state.set_function("log_error", [this](const std::string &message)
+            {
+                this->_log(logging::Error) << message << std::endl;
+            });
+            _state.set_function("log_debug", [this](const std::string &message)
+            {
+                this->_log(logging::Debug) << message << std::endl;
+            });
+            _state.set_function("log_warning", [this](const std::string &message)
+            {
+                this->_log(logging::Warning) << message << std::endl;
+            });
+        }
+
+        template <typename Entity, typename EntityManager>
+        void registerEntityManager(EntityManager &&ettMgr)
+        {
+            _log(logging::Debug) << "register EntityManager" << std::endl;
+            _state.set_function("createEntity", [&ettMgr]() { return ettMgr.createEntity(); });
+            _state.set_function("getEntity", [&ettMgr](typename Entity::ID id) -> Entity & {
+                return std::ref(ettMgr.getEntity(id));
+            });
+            _state.set_function("getEntityConst", [&ettMgr](typename Entity::ID id) -> const Entity & {
+                return std::ref(ettMgr.getEntityConst(id));
+            });
         }
 
         template <typename T>
@@ -39,19 +76,6 @@ namespace sfme::scripting
                 }, table);
         }
 
-        template <typename Entity, typename EntityManager>
-        void registerEntityManager(EntityManager &&ettMgr)
-        {
-            _log(logging::Debug) << "register EntityManager" << std::endl;
-            _state.set_function("createEntity", [&ettMgr]() { return ettMgr.createEntity(); });
-            _state.set_function("getEntity", [&ettMgr](typename Entity::ID id) -> Entity & {
-                return std::ref(ettMgr.getEntity(id));
-            });
-            _state.set_function("getEntityConst", [&ettMgr](typename Entity::ID id) -> const Entity & {
-                return std::ref(ettMgr.getEntityConst(id));
-            });
-        }
-
         template <typename Component, typename Entity>
         void registerComponent()
         {
@@ -63,6 +87,11 @@ namespace sfme::scripting
 
             _state[Entity::className()]["remove"s + Component::className() + "Component"s] = [](Entity &self) {
                 self.template removeComponent<Component>();
+            };
+
+            _state[Entity::className()]["add"s + Component::className() + "Component"s] = []([[maybe_unused]] Entity &self) {
+                if constexpr (std::is_default_constructible_v<Component>)
+                    self.template addComponent<Component>();
             };
         }
 
@@ -93,20 +122,19 @@ namespace sfme::scripting
         void loadScript(const std::string &fileName) noexcept
         {
             try {
-                _state.script_file((_pathScriptDirectory / fs::path(fileName)).string());
+                _state.script_file((_directoryScriptPath / fs::path(fileName)).string());
                 _log(logging::Debug) << "Successfully register script: " << fileName << std::endl;
             } catch (const std::exception &e) {
                 _log(logging::Error) << fileName << ": " << e.what() << std::endl;
             }
         }
 
-        template<typename Entity, typename ScriptComponent, typename EntityManager>
-        void loadAllEntitiesScript(EntityManager&& ettMgr) noexcept
+        template <typename Entity, typename ScriptComponent, typename EntityManager>
+        void loadAllEntitiesScript(EntityManager &&ettMgr) noexcept
         {
-            ettMgr.template for_each<ScriptComponent>([this](const Entity& et) {
+            ettMgr.template for_each<ScriptComponent>([this](const Entity &et) {
                 const std::string &fileName = et.template getComponent<ScriptComponent>().scriptName;
-                const std::string &self = et.template getComponent<ScriptComponent>().selfName;
-                ScriptingLua::loadScript(fileName);
+                LuaSystem::loadScript(fileName);
             });
         };
 
@@ -121,7 +149,7 @@ namespace sfme::scripting
         }
 
         template <typename ReturnType = void, typename ...Args>
-        ReturnType executeScopedFunction(const std::string& scopName, const std::string &funcName, Args &&...args)
+        ReturnType executeScopedFunction(const std::string &scopName, const std::string &funcName, Args &&...args)
         {
             if constexpr (std::is_void_v<ReturnType>) {
                 _state[scopName][funcName](std::forward<Args>(args)...);
@@ -132,8 +160,7 @@ namespace sfme::scripting
 
     private:
         sol::state _state;
-        fs::path _pathScriptDirectory;
-        using Logger = logging::Logger;
-        Logger _log{"lua-engine", logging::Debug};
+        fs::path _directoryScriptPath;
+        logging::Logger _log{"lua-system", logging::Debug};
     };
 }

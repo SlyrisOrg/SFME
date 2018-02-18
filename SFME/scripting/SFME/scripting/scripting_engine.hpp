@@ -6,33 +6,46 @@
 
 #include <experimental/filesystem>
 #include <core/meta/List.hpp>
+#include <SFME/ecs/ecs.hpp>
 
 namespace fs = std::experimental::filesystem;
 
 namespace sfme::scripting
 {
     template <typename GameTraits>
-    class ScriptingEngine : private GameTraits::TScriptingLanguage
+    class ScriptedSystem : public sfme::ecs::LogicUpdateSystem<ScriptedSystem<GameTraits>>,
+                           private GameTraits::TScriptingSystem
     {
     public:
-        using TScriptLang = typename GameTraits::TScriptingLanguage;
+        static const std::string &className() noexcept
+        {
+            return GameTraits::TScriptingSystem::className();
+        }
+
+    public:
+        using TScriptingSystem = typename GameTraits::TScriptingSystem;
         using TComponents = typename GameTraits::TComponents;
         using TEntityManager = typename GameTraits::TEntityManager;
         using TSystemManager = typename GameTraits::TSystemManager;
         using TEntity = typename GameTraits::TEntity;
+        using TEventManager = typename GameTraits::TEventManager;
+        using TSystem = sfme::ecs::LogicUpdateSystem<ScriptedSystem<GameTraits>>;
+
     public:
-        ScriptingEngine(TEntityManager &ettMgr, TSystemManager &systemMgr) noexcept :
-            TScriptLang(), _ettMgr(ettMgr), _systemMgr(systemMgr)
+        ScriptedSystem(TEventManager &evtMgr, TEntityManager &ettMgr) noexcept :
+            TSystem::System(evtMgr),
+            TScriptingSystem(),
+            _ettMgr(ettMgr)
         {
             registerType<TEntity>();
-            TScriptLang::template registerEntityManager<TEntity>(_ettMgr);
-            TScriptLang::template registerComponents<TEntity>(TComponents{});
+            TScriptingSystem::template registerEntityManager<TEntity>(_ettMgr);
+            TScriptingSystem::template registerComponents<TEntity>(TComponents{});
         }
 
         template <typename Type>
         void registerType() noexcept
         {
-            TScriptLang::template registerType<Type>();
+            TScriptingSystem::template registerType<Type>();
         }
 
         template <typename ...Types>
@@ -41,32 +54,54 @@ namespace sfme::scripting
             (registerType<Types>(), ...);
         }
 
-        template <typename TypeList>
-        void registerSystems() noexcept
+        template <typename TypeList, typename SystemManager>
+        void registerSystems(SystemManager &&systemMgr) noexcept
         {
             registerTypeList(TypeList{});
-            TScriptLang::registerSystems(_systemMgr, TypeList{});
+            TScriptingSystem::registerSystems(systemMgr, TypeList{});
         }
 
         template <typename ScriptComponent>
         void loadEntitiesScript() noexcept
         {
-            TScriptLang::template loadAllEntitiesScript<TEntity, ScriptComponent>(_ettMgr);
+            TScriptingSystem::template loadAllEntitiesScript<TEntity, ScriptComponent>(_ettMgr);
         };
+
+        void loadScript(const std::string& fileName) noexcept
+        {
+            TScriptingSystem::loadScript(fileName);
+        }
 
         template<typename ReturnType = void, typename ...Args>
         ReturnType executeGlobalFunction(const std::string &funcName, Args&& ...args) noexcept
         {
-            return TScriptLang::template executeGlobalFunction(funcName, std::forward<Args>(args)...);
+            return TScriptingSystem::template executeGlobalFunction<ReturnType>(funcName, std::forward<Args>(args)...);
         }
 
         template<typename ReturnType = void, typename ...Args>
         ReturnType executeScopedFunction(const std::string &scopName, const std::string &funcName, Args&& ...args) noexcept
         {
-            return TScriptLang::template executeScopedFunction(scopName, funcName, std::forward<Args>(args)...);
+            return TScriptingSystem::template executeScopedFunction<ReturnType>(scopName, funcName, std::forward<Args>(args)...);
         }
+
+        void update() noexcept override
+        {
+        }
+
+        ~ScriptedSystem() noexcept override = default;
+
+    public:
+        static constexpr auto reflectedFunctions() noexcept
+        {
+            return meta::makeMap();
+        }
+
+        static constexpr auto reflectedMembers() noexcept
+        {
+            return meta::makeMap();
+        }
+
     private:
         TEntityManager &_ettMgr;
-        TSystemManager &_systemMgr;
     };
 }

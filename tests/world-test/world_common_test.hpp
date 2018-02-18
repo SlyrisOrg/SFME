@@ -41,5 +41,5 @@ namespace sfme::example
     }
 
     using Components = meta::TypeList<components::Box>;
-    using GameTraits = sfme::world::Traits<Components, sfme::scripting::ScriptingLua>;
+    //using GameTraits = sfme::world::Traits<Components, sfme::scripting::ScriptingLua>;
 }

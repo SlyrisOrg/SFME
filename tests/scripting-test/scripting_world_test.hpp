@@ -4,11 +4,13 @@
 
 #pragma once
 
-#include <SFME/world/world.hpp>
+#include <SFME/scripting/scripting.hpp>
+#include <SFME/scripting/scripting_lua.hpp>
+#include <SFME/world/details/world_traits.hpp>
 
 namespace sfme::example::components
 {
-    struct Script
+   struct Script
     {
         Script(std::string _scriptName, std::string _selfName, std::string _tableName = "") noexcept :
             scriptName(std::move(_scriptName)),
@@ -62,9 +64,10 @@ namespace sfme::example::components
 namespace sfme::example
 {
     using Components = meta::TypeList<components::PV, components::Script>;
-    using GameTraits = sfme::world::Traits<Components, sfme::scripting::ScriptingLua>;
+    using GameTraits = sfme::world::Traits<Components, sfme::scripting::LuaSystem>;
     using EntityManager = GameTraits::TEntityManager;
     using Entity = GameTraits::TEntity;
+    using ScriptingSystem = scripting::ScriptedSystem<GameTraits>;
 }
 
 namespace sfme::example::system
@@ -162,5 +165,5 @@ namespace sfme::example::system
 
 namespace sfme::example
 {
-    using SystemList = meta::TypeList<system::Logical, system::PreUpdate, system::PostUpdate>;
+    using SystemList = meta::TypeList<system::Logical, system::PreUpdate, system::PostUpdate, sfme::scripting::ScriptedSystem<GameTraits>>;
 }

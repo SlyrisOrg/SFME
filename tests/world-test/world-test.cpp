@@ -6,7 +6,7 @@
 #include <SFME/world/world.hpp>
 #include "world_common_test.hpp"
 
-class WorldTesting : public sfme::World<sfme::example::GameTraits>, public testing::Test
+/*class WorldTesting : public sfme::World<sfme::example::GameTraits>, public testing::Test
 {
 
 };
@@ -14,4 +14,4 @@ class WorldTesting : public sfme::World<sfme::example::GameTraits>, public testi
 TEST_F(WorldTesting, Basic)
 {
 
-}
+}*/

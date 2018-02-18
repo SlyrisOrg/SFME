@@ -1,7 +1,7 @@
 include(CMakeSources.cmake)
 set(MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 CREATE_MODULE(SFME::Scripting "${MODULE_SOURCES}" ${MODULE_PATH})
-target_link_libraries(SFME-Scripting INTERFACE SFME::ECS Core::Log)
+target_link_libraries(SFME-Scripting INTERFACE SFME::ECS)
 if (SFME_USING_LUA_SCRIPTING)
     find_package(Lua 5.3)
     target_link_libraries(SFME-Scripting INTERFACE ${LUA_LIBRARIES})

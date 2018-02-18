@@ -5,7 +5,6 @@
 #pragma once
 
 #include <SFME/world/details/world_traits.hpp>
-#include <SFME/scripting/scripting.hpp>
 
 namespace sfme
 {
@@ -17,12 +16,10 @@ namespace sfme
         using EventManager = typename WorldTraits::TEventManager;
         using EntityManager = typename WorldTraits::TEntityManager;
         using SystemManager = typename WorldTraits::TSystemManager;
-        using ScriptingEngine = typename world::TScriptingEngine<WorldTraits>;
 
     protected:
         EventManager _evtMgr;
         EntityManager _ettMgr;
         SystemManager _sysMgr{_evtMgr, _ettMgr};
-        ScriptingEngine _scriptingEngine{_ettMgr, _sysMgr};
     };
 }
