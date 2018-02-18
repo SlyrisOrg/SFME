@@ -19,8 +19,9 @@ namespace sfme::example
         {
         }
     };
-}
 
-TEST(Scripting, Basic)
-{
+    TEST_F(Game, Basic)
+    {
+
+    }
 }
