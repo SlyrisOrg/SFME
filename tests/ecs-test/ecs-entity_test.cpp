@@ -9,6 +9,7 @@
 
 struct Box
 {
+	reflect_class(Box);
     Box(unsigned int x, unsigned int y, unsigned int width, unsigned int height) noexcept :
         x(x), y(y), width(width), height(height)
     {
@@ -22,12 +23,14 @@ struct Box
 
 struct Lol
 {
+	reflect_class(Lol);
     int i{2};
     int j{3};
 };
 
 struct Lul
 {
+	reflect_class(Lul);
 };
 
 using Components = meta::TypeList<Box, Lol, Lul>;
@@ -63,6 +66,8 @@ TEST(ECS, EntityManager)
     Lol &lol = em[id].getComponent<Lol>();
     ASSERT_EQ(lol.i, 2);
     ASSERT_EQ(lol.j, 3);
+	ASSERT_TRUE(em[id].hasComponents("Box", "Lol"));
+	ASSERT_FALSE(em[id].hasComponents("Box", "Lol", "Lul"));
 
     em[id].removeComponent<Lol>();
     ASSERT_FALSE(em[id].hasComponent<Lol>());
@@ -72,6 +77,8 @@ TEST(ECS, EntityManager)
     ASSERT_EQ(box3.y, 2u);
     ASSERT_EQ(box3.width, 3u);
     ASSERT_EQ(box3.height, 4u);
+	ASSERT_TRUE(em[id].hasComponents("Box"));
+	ASSERT_FALSE(em[id].hasComponents("Lol"));
 }
 
 TEST(ECS, SimpleForEach)

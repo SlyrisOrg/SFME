@@ -52,11 +52,6 @@ namespace sfme::example::components
             return meta::makeMap(reflect_member(&PV::pv));
         }
 
-        explicit PV(unsigned int _pv) noexcept : pv(_pv)
-        {
-
-        }
-
         unsigned int pv;
     };
 }

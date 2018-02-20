@@ -32,16 +32,18 @@ namespace sfme::ecs
     public:
         EntityID createEntity() noexcept
         {
-            return createEntity(_nextID());
+            return _createEntity(_nextID());
         }
 
-        EntityID createEntity(EntityID id) noexcept
+    private:
+        EntityID _createEntity(EntityID id) noexcept
         {
             auto pair = _entities.emplace(id, Entity(id, _allocators));
 
             return pair.first->first;
         }
 
+    public:
         Entity &operator[](EntityID id) noexcept
         {
             return _entities.at(id);
@@ -52,12 +54,12 @@ namespace sfme::ecs
             return _entities.at(id);
         }
 
-        Entity& getEntity(EntityID id) noexcept
+        Entity &getEntity(EntityID id) noexcept
         {
             return operator[](id);
         }
 
-        const Entity& getEntityConst(EntityID id) const noexcept
+        const Entity &getEntityConst(EntityID id) const noexcept
         {
             return operator[](id);
         }
@@ -71,6 +73,18 @@ namespace sfme::ecs
                     pred(entity);
                 }
             }
+        }
+
+        template <typename ComponentType>
+        std::vector<Entity *> getEntitiesWithComponent() noexcept
+        {
+            std::vector<Entity *> entities;
+            for (auto & [id, entity] : _entities) {
+                static_cast<void>(id);
+                if (entity.template hasComponent<ComponentType>())
+                    entities.push_back(&entity);
+            }
+            return entities;
         }
 
         void sweepEntities() noexcept
@@ -89,14 +103,21 @@ namespace sfme::ecs
         }
 
     public:
+        reflect_class(EntityManager)
+
+        static constexpr auto reflectedMembers() noexcept
+        {
+            return meta::makeMap();
+        }
+
         static constexpr auto reflectedFunctions() noexcept
         {
             return meta::makeMap(reflect_function(&EntityManager::nbEntities),
                                  reflect_function(&EntityManager::clear),
-                                 reflect_function(&EntityManager::nbEntities),
                                  reflect_function(&EntityManager::sweepEntities),
                                  reflect_function(&EntityManager::getEntity),
-                                 reflect_function(&EntityManager::getEntityConst));
+                                 reflect_function(&EntityManager::getEntityConst),
+                                 reflect_function(&EntityManager::createEntity));
         }
 
     private:

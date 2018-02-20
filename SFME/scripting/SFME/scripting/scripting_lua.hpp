@@ -9,6 +9,7 @@
 #include <core/meta/List.hpp>
 #include <core/reflection/Reflection.hpp>
 #include <core/log/Logger.hpp>
+#include <utility>
 
 namespace fs = std::experimental::filesystem;
 
@@ -21,7 +22,7 @@ namespace sfme::scripting
 
     protected:
         LuaSystem(fs::path path = fs::current_path() / fs::path("lua_scripts")) noexcept :
-            _directoryScriptPath(path)
+            _directoryScriptPath(std::move(path))
         {
             _state.open_libraries();
             registerBasicFunctions();
@@ -29,20 +30,16 @@ namespace sfme::scripting
 
         void registerBasicFunctions() noexcept
         {
-            _state.set_function("log_info", [this](const std::string &message)
-            {
+            _state.set_function("log_info", [this](const std::string &message) {
                 this->_log(logging::Info) << message << std::endl;
             });
-            _state.set_function("log_error", [this](const std::string &message)
-            {
+            _state.set_function("log_error", [this](const std::string &message) {
                 this->_log(logging::Error) << message << std::endl;
             });
-            _state.set_function("log_debug", [this](const std::string &message)
-            {
+            _state.set_function("log_debug", [this](const std::string &message) {
                 this->_log(logging::Debug) << message << std::endl;
             });
-            _state.set_function("log_warning", [this](const std::string &message)
-            {
+            _state.set_function("log_warning", [this](const std::string &message) {
                 this->_log(logging::Warning) << message << std::endl;
             });
         }
@@ -50,14 +47,7 @@ namespace sfme::scripting
         template <typename Entity, typename EntityManager>
         void registerEntityManager(EntityManager &&ettMgr)
         {
-            _log(logging::Debug) << "register EntityManager" << std::endl;
-            _state.set_function("createEntity", [&ettMgr]() { return ettMgr.createEntity(); });
-            _state.set_function("getEntity", [&ettMgr](typename Entity::ID id) -> Entity & {
-                return std::ref(ettMgr.getEntity(id));
-            });
-            _state.set_function("getEntityConst", [&ettMgr](typename Entity::ID id) -> const Entity & {
-                return std::ref(ettMgr.getEntityConst(id));
-            });
+            _state["entityManager"] = std::ref(ettMgr);
         }
 
         template <typename T>
@@ -76,8 +66,8 @@ namespace sfme::scripting
                 }, table);
         }
 
-        template <typename Component, typename Entity>
-        void registerComponent()
+        template <typename Component, typename Entity, typename EntityManager>
+        void registerComponent(EntityManager &&ettMgr)
         {
             using namespace std::string_literals;
             _log(logging::Debug) << "register component: " << Component::className() << std::endl;
@@ -89,17 +79,22 @@ namespace sfme::scripting
                 self.template removeComponent<Component>();
             };
 
-            _state[Entity::className()]["add"s + Component::className() + "Component"s] = []([[maybe_unused]] Entity &self) {
+            _state[Entity::className()]["add"s + Component::className() + "Component"s] = [](
+                [[maybe_unused]] Entity &self) {
                 if constexpr (std::is_default_constructible_v<Component>)
-                    self.template addComponent<Component>();
+                    return std::ref(self.template addComponent<Component>());
+            };
+
+            _state[ettMgr.className()]["getEntityWith"s + Component::className() + "Component"s] = [&ettMgr]() {
+                return ettMgr.template getEntitiesWithComponent<Component>();
             };
         }
 
-        template <typename Entity, typename ...Types>
-        void registerComponents(meta::TypeList<Types...>) noexcept
+        template <typename Entity, typename EntityManager, typename ...Types>
+        void registerComponents(EntityManager &&ettMgr, meta::TypeList<Types...>) noexcept
         {
             (registerType<Types>(), ...);
-            (registerComponent<Types, Entity>(), ...);
+            (registerComponent<Types, Entity>(std::forward<EntityManager>(ettMgr)), ...);
         }
 
         template <typename SystemType, typename SystemManager>

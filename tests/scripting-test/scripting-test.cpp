@@ -10,15 +10,6 @@ namespace sfme::example
 {
     class ScriptingFixture : public sfme::World<GameTraits>, public testing::Test
     {
-    private:
-        /*void createEntities() noexcept
-        {
-            auto id = _ettMgr.createEntity();
-            auto &player = _ettMgr.getEntity(id);
-            player.addComponent<components::Script>("player.lua", "player", "playerTable");
-            player.addComponent<components::PV>(100);
-        }*/
-
     protected:
         void SetUp() override
         {
@@ -56,6 +47,16 @@ namespace sfme::example
     TEST_F(ScriptingFixture, EntityManager)
     {
         ScriptingSystem& scriptSystem = _sysMgr.getSystem<ScriptingSystem>();
-        scriptSystem.executeGlobalFunction("testEntityManager");
+        using Result = std::tuple<Entity::ID, unsigned int>;
+        auto[ettID, res]  = scriptSystem.executeGlobalFunction<Result>("testEntityManager");
+        ASSERT_EQ(res, _ettMgr[ettID].getComponent<components::PV>().pv);
+        scriptSystem.executeGlobalFunction("testClearEntities");
+        ASSERT_EQ(_ettMgr.nbEntities(), 0);
+    }
+
+	TEST_F(ScriptingFixture, GetEntityWithSpecificComponents)
+    {
+		ScriptingSystem& scriptSystem = _sysMgr.getSystem<ScriptingSystem>();
+		scriptSystem.executeGlobalFunction("testGetEntityWithSpecificComponents");
     }
 }

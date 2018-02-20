@@ -38,8 +38,9 @@ namespace sfme::scripting
             _ettMgr(ettMgr)
         {
             registerType<TEntity>();
+			registerType<TEntityManager>();
             TScriptingSystem::template registerEntityManager<TEntity>(_ettMgr);
-            TScriptingSystem::template registerComponents<TEntity>(TComponents{});
+            TScriptingSystem::template registerComponents<TEntity>(_ettMgr, TComponents{});
         }
 
         template <typename Type>

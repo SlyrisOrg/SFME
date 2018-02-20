@@ -79,7 +79,7 @@ namespace sfme::ecs::details
         }
 
         template <typename ...Args>
-        std::tuple<std::add_lvalue_reference_t < Args>...>
+        std::tuple<std::add_lvalue_reference_t<Args>...>
 
         getComponents() noexcept
         {
@@ -87,7 +87,7 @@ namespace sfme::ecs::details
         }
 
         template <typename ...Args>
-        std::tuple <std::add_lvalue_reference_t<std::add_const_t < Args>>...>
+        std::tuple<std::add_lvalue_reference_t<std::add_const_t<Args>>...>
 
         getComponents() const noexcept
         {
@@ -110,6 +110,20 @@ namespace sfme::ecs::details
             return hasComponent<T>();
         }
 
+        bool hasComponents(const std::string &&component)
+        {
+            return std::any_of(_componentsMemoisation.begin(), _componentsMemoisation.end(),
+                               [name = std::move(component)](const std::string &componentName) {
+                                   return componentName == name;
+                               });
+        }
+
+        template <typename... Components>
+        bool hasComponents(const std::string &cmp, Components &&...components)
+        {
+            return hasComponents(std::move(cmp)) && hasComponents(std::forward<Components>(components)...);
+        }
+
         template <typename T, typename ...Args>
         T &addComponent(Args &&...args)
         {
@@ -119,6 +133,7 @@ namespace sfme::ecs::details
 
             std::get<pos>(_components) = AllocTraits<T>::allocate(al, 1);
             AllocTraits<T>::construct(al, std::get<pos>(_components), args...);
+            _componentsMemoisation.push_back(T::className());
             return getComponent<T>();
         }
 
@@ -132,6 +147,9 @@ namespace sfme::ecs::details
             AllocTraits<T>::destroy(al, std::get<pos>(_components));
             AllocTraits<T>::deallocate(al, std::get<pos>(_components), 1);
             std::get<pos>(_components) = nullptr;
+            algo::erase_if(_componentsMemoisation, [](auto &&componentName) {
+                return T::className() == componentName;
+            });
         }
 
         reflect_class(Entity)
@@ -140,11 +158,13 @@ namespace sfme::ecs::details
         {
             return meta::makeMap(reflect_function(&Entity::getID));
         }
+
     private:
         ID _id;
         AllocatorsTuple &_allocators;
         ComponentsPtrTuple _components;
         bool _marked{false};
+        std::vector<std::string> _componentsMemoisation;
 
     public:
         static constexpr auto reflectedMembers() noexcept
