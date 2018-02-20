@@ -48,6 +48,30 @@ namespace sfme::scripting
         void registerEntityManager(EntityManager &&ettMgr)
         {
             _state["entityManager"] = std::ref(ettMgr);
+			auto ov = sol::overload(
+			[](EntityManager& self, const std::string& component)
+			{
+				return self.getEntitiesWithComponents(component);
+			},
+			[](EntityManager& self, const std::string& component, const std::string& component2)
+			{
+				return self.getEntitiesWithComponents(component, component2);
+			},
+        	[](EntityManager& self, const std::string& component, const std::string& component2, const std::string& component3)
+			{
+				return self.getEntitiesWithComponents(component, component2, component3);
+			},
+			[](EntityManager& self, const std::string& component, const std::string& component2, const std::string& component3, const std::string& component4)
+			{
+				return self.getEntitiesWithComponents(component, component2, component3, component4);
+			},
+			[](EntityManager& self, const std::string& component, const std::string& component2, const std::string& component3,
+				const std::string& component4, const std::string& component5)
+			{
+				return self.getEntitiesWithComponents(component, component2, component3, component4, component5);
+			});
+			using namespace std::string_literals;
+			_state["EntityManager"]["getEntitiesWithComponents"s] = ov;
         }
 
         template <typename T>
@@ -79,14 +103,19 @@ namespace sfme::scripting
                 self.template removeComponent<Component>();
             };
 
+			_state[Entity::className()]["has"s + Component::className() + "Component"s] = [](Entity& self)
+			{
+				return self.template hasComponent<Component>();
+			};
+
             _state[Entity::className()]["add"s + Component::className() + "Component"s] = [](
                 [[maybe_unused]] Entity &self) {
                 if constexpr (std::is_default_constructible_v<Component>)
                     return std::ref(self.template addComponent<Component>());
             };
 
-            _state[ettMgr.className()]["getEntityWith"s + Component::className() + "Component"s] = [&ettMgr]() {
-                return ettMgr.template getEntitiesWithComponent<Component>();
+            _state[ettMgr.className()]["getEntityWith"s + Component::className() + "Component"s] = [](EntityManager& self) {
+                return self.template getEntitiesWithComponent<Component>();
             };
         }
 

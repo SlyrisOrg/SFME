@@ -87,6 +87,21 @@ namespace sfme::ecs
             return entities;
         }
 
+		template<typename ...Args>
+		std::vector<Entity *> getEntitiesWithComponents(Args&& ...args) noexcept
+        {
+			std::vector<Entity *> entities;
+			for (auto &[id, entity] : _entities)
+			{
+				static_cast<void>(id);
+				if (entity.hasComponents(std::forward<Args>(args)...))
+				{
+					entities.push_back(&entity);
+				}
+			}
+			return entities;
+        }
+
         void sweepEntities() noexcept
         {
             algo::erase_if(_entities, [](auto &&pair) { return pair.second.isMarked(); });

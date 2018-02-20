@@ -32,16 +32,23 @@ end
 
 function testGetEntityWithSpecificComponents()
     -- body
-    for i=0, 25 do
+    for i=1, 25 do
         local id = entityManager:createEntity()
         local entity = entityManager:getEntity(id)
         local componentPV = entity:addPVComponent()
         componentPV.pv = i
     end
     
-    for _, go in ipairs(EntityManager:getEntityWithPVComponent()) do
-        log_info("pv : " .. go:getPVComponent().pv)
+    assert(entityManager:getEntityWithPVComponent():size() == 25)
+    
+    for i=1,10 do
+        local id = entityManager:createEntity()
+        local entity = entityManager:getEntity(id)
+        local componentPV = entity:addPVComponent()
+        local componentMana = entity:addManaComponent()
     end
+
+    assert(entityManager:getEntitiesWithComponents("PV", "Mana"):size() == 10)
 end
 
 function testClearEntities()

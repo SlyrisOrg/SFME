@@ -10,6 +10,22 @@
 
 namespace sfme::example::components
 {
+   struct Mana
+   {
+	   reflect_class(Mana)
+	   unsigned int mana{0};
+
+	   static constexpr auto reflectedFunctions() noexcept
+	   {
+		   return meta::makeMap();
+	   }
+
+	   static constexpr auto reflectedMembers() noexcept
+	   {
+		   return meta::makeMap(reflect_member(&Mana::mana));
+	   }
+   };
+
    struct Script
     {
         Script(std::string _scriptName, std::string _selfName, std::string _tableName = "") noexcept :
@@ -58,7 +74,7 @@ namespace sfme::example::components
 
 namespace sfme::example
 {
-    using Components = meta::TypeList<components::PV, components::Script>;
+    using Components = meta::TypeList<components::PV, components::Script, components::Mana>;
     using GameTraits = sfme::world::Traits<Components, sfme::scripting::LuaSystem>;
     using EntityManager = GameTraits::TEntityManager;
     using Entity = GameTraits::TEntity;

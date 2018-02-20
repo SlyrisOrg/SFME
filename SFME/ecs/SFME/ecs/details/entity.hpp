@@ -2,8 +2,7 @@
 // Created by sztergbaum roman on 2/17/2018.
 //
 
-#ifndef SFME_ENTITY_HPP
-#define SFME_ENTITY_HPP
+#pragma once
 
 #include <memory>
 #include <type_traits>
@@ -110,18 +109,18 @@ namespace sfme::ecs::details
             return hasComponent<T>();
         }
 
-        bool hasComponents(const std::string &&component)
+        bool hasComponents(const std::string &component)
         {
             return std::any_of(_componentsMemoisation.begin(), _componentsMemoisation.end(),
-                               [name = std::move(component)](const std::string &componentName) {
-                                   return componentName == name;
+                               [&component](const std::string &componentName) {
+                                   return componentName == component;
                                });
         }
 
         template <typename... Components>
         bool hasComponents(const std::string &cmp, Components &&...components)
         {
-            return hasComponents(std::move(cmp)) && hasComponents(std::forward<Components>(components)...);
+            return hasComponents(cmp) && hasComponents(std::forward<Components>(components)...);
         }
 
         template <typename T, typename ...Args>
@@ -173,5 +172,3 @@ namespace sfme::ecs::details
         }
     };
 }
-
-#endif //SFME_ENTITY_HPP
