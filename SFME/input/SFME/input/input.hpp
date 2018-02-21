@@ -5,3 +5,4 @@
 #pragma once
 
 #include <SFME/input/keyboard.hpp>
+#include <SFME/input/mouse.hpp>
