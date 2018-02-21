@@ -5,7 +5,7 @@ target_link_libraries(SFME-Scripting INTERFACE SFME::ECS)
 if (SFME_USING_LUA_SCRIPTING)
     find_package(Lua 5.3)
     target_link_libraries(SFME-Scripting INTERFACE ${LUA_LIBRARIES})
-    target_include_directories(SFME-Scripting INTERFACE "${CMAKE_SOURCE_DIR}/vendor/sol2" "${LUA_INCLUDE_DIR}")
+    target_include_directories(SFME-Scripting INTERFACE "${SFME_ROOT_DIRECTORY}/vendor/sol2" "${LUA_INCLUDE_DIR}")
 endif()
 
 if (LINUX)
