@@ -18,7 +18,7 @@ namespace sfme::mediator::details
     }
 
     template <typename T>
-    EventTypeID getTypeId() noexcept
+    EventTypeID getEventTypeID() noexcept
     {
         static EventTypeID id{generateTypeId()};
 

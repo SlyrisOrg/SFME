@@ -17,47 +17,46 @@ namespace sfme::mediator
     {
     public:
         template <typename TEvent, typename TReceiver>
-        void subscribe(TReceiver &receiver) noexcept
-        {
-            static_assert(details::is_mediator_event<TEvent>, "The template parameter must be timestep of BaseEvent");
-            const details::EventTypeID familyId = details::getTypeId<TEvent>();
-            BaseReceiver &base = receiver;
-            auto pair = std::make_pair(&base,
-                                       std::make_shared<details::EventCallbackWrapper<TEvent>>(
-                                           [&receiver](const auto &ev) noexcept {
-                                               receiver.receive(ev);
-                                           }));
-            _receivers[familyId].emplace_back(std::move(pair));
+		void subscribe(TReceiver &receiver) noexcept
+		{
+			static_assert(details::is_mediator_event<TEvent>, "The template parameter must be base of BaseEvent");
+			const details::EventTypeID eventTypeID = details::getEventTypeID<TEvent>();
+			const BaseReceiver &baseReceiver = receiver;
+			_receiversRegistry.insert(std::make_pair(eventTypeID, ReceiverData{&baseReceiver,
+				std::make_unique<details::EventCallbackWrapper<TEvent>>([&receiver](const auto &ev) noexcept {
+				receiver.receive(ev);
+			})}));
         };
 
         template <typename TEvent, typename ... Args>
         void emit(Args &&... args) noexcept
         {
-            static_assert(details::is_mediator_event<TEvent>, "The template parameter must be timestep of BaseEvent");
+            static_assert(details::is_mediator_event<TEvent>, "The template parameter must be base of BaseEvent");
             TEvent event(std::forward<Args>(args)...);
-            const details::EventTypeID familyId = details::getTypeId<TEvent>();
-
-            std::for_each(begin(_receivers[familyId]), end(_receivers[familyId]), [&event](const auto &pr) noexcept {
-                //! Otherwise MSVC ambiguous call...
-                pr.second->operator()(&event);
-            });
+            const details::EventTypeID eventTypeID = details::getEventTypeID<TEvent>();
+	        auto&& receivers = _receiversRegistry.equal_range(eventTypeID);
+			std::for_each(receivers.first, receivers.second, [&event](const auto& receiverEntry) noexcept
+			{
+				receiverEntry.second.callback->operator()(&event);
+			});
         };
 
-        bool isRegister(BaseReceiver &receiver) const noexcept
+        bool isRegister(const BaseReceiver &receiver) const noexcept
         {
-            for (auto &&receivers : _receivers) {
-                for (auto &&vec: receivers.second) {
-                    if (vec.first == &receiver)
-                        return true;
-                }
-            }
-            return false;
+			return std::any_of(begin(_receiversRegistry), end(_receiversRegistry), [&receiver](auto const& receiverEntry)
+			{
+				return receiverEntry.second.receiver == &receiver;
+			});
         }
 
     private:
-        using CbPtr = std::shared_ptr<details::BaseEventCallbackWrapper>;
-        using ReceiversVector = std::vector<std::pair<BaseReceiver *, CbPtr>>;
-        using ReceiversMap = std::unordered_map<details::EventTypeID, ReceiversVector>;
-        ReceiversMap _receivers;
+        using CallbackPtr = std::unique_ptr<details::BaseEventCallbackWrapper>;
+		struct ReceiverData
+    	{
+			const BaseReceiver *receiver;
+			CallbackPtr callback;
+		};
+		using ReceiversMap = std::unordered_multimap<details::EventTypeID, ReceiverData>;
+        ReceiversMap _receiversRegistry;
     };
 }
