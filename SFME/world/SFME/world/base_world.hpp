@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <SFME/world/details/world_traits.hpp>
+#include <SFME/world/world_traits.hpp>
 
 namespace sfme
 {

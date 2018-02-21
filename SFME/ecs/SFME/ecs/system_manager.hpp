@@ -95,7 +95,7 @@ namespace sfme::ecs
             (createSystem<Systems>(), ...);
         }
 
-        bool loadPlugin(std::string&& pluginName, std::string &&creatorFunc = "createSystem") noexcept
+        bool loadPlugin(std::string &&pluginName, std::string &&creatorFunc = "createSystem") noexcept
         {
             try {
                 auto &&creator = _plugins.emplace_back(lib::getSymbol<CreatorFunc>(_pluginPath / fs::path(pluginName),
@@ -129,10 +129,9 @@ namespace sfme::ecs
                 if (!fs::is_regular_file(*it)) {
                     continue;
                 }
-				if (details::is_shared_library(it->path())) {
-					res &= loadPlugin(it->path().filename().string(), std::move(creatorFunc));
-				}
-
+                if (details::is_shared_library(it->path())) {
+                    res &= loadPlugin(it->path().filename().string(), std::move(creatorFunc));
+                }
             }
             return res;
         }

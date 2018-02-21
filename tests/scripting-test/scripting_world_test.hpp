@@ -6,7 +6,7 @@
 
 #include <SFME/scripting/scripting.hpp>
 #include <SFME/scripting/scripting_lua.hpp>
-#include <SFME/world/details/world_traits.hpp>
+#include <SFME/world/world_traits.hpp>
 
 namespace sfme::example::components
 {
@@ -176,5 +176,5 @@ namespace sfme::example::system
 
 namespace sfme::example
 {
-    using SystemList = meta::TypeList<system::Logical, system::PreUpdate, system::PostUpdate, sfme::scripting::ScriptedSystem<GameTraits>>;
+    using SystemList = meta::TypeList<system::Logical, system::PreUpdate, system::PostUpdate, sfme::example::ScriptingSystem>;
 }

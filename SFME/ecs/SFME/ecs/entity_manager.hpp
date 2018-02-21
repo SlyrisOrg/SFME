@@ -22,6 +22,7 @@ namespace sfme::ecs
         using AllocatorsTuple = typename Entity::AllocatorsTuple;
 
     private:
+        //! Private member functions
         EntityID _nextID() noexcept
         {
             static EntityID curID{0};
@@ -29,13 +30,6 @@ namespace sfme::ecs
             return curID++;
         }
 
-    public:
-        EntityID createEntity() noexcept
-        {
-            return _createEntity(_nextID());
-        }
-
-    private:
         EntityID _createEntity(EntityID id) noexcept
         {
             auto pair = _entities.emplace(id, Entity(id, _allocators));
@@ -44,14 +38,10 @@ namespace sfme::ecs
         }
 
     public:
-        Entity &operator[](EntityID id) noexcept
+        //! Public member functions
+        EntityID createEntity() noexcept
         {
-            return _entities.at(id);
-        }
-
-        const Entity &operator[](EntityID id) const noexcept
-        {
-            return _entities.at(id);
+            return _createEntity(_nextID());
         }
 
         Entity &getEntity(EntityID id) noexcept
@@ -87,19 +77,17 @@ namespace sfme::ecs
             return entities;
         }
 
-		template<typename ...Args>
-		std::vector<Entity *> getEntitiesWithComponents(Args&& ...args) noexcept
+        template <typename ...Args>
+        std::vector<Entity *> getEntitiesWithComponents(Args &&...args) noexcept
         {
-			std::vector<Entity *> entities;
-			for (auto &[id, entity] : _entities)
-			{
-				static_cast<void>(id);
-				if (entity.hasComponents(std::forward<Args>(args)...))
-				{
-					entities.push_back(&entity);
-				}
-			}
-			return entities;
+            std::vector<Entity *> entities;
+            for (auto & [id, entity] : _entities) {
+                static_cast<void>(id);
+                if (entity.hasComponents(std::forward<Args>(args)...)) {
+                    entities.push_back(&entity);
+                }
+            }
+            return entities;
         }
 
         void sweepEntities() noexcept
@@ -118,6 +106,19 @@ namespace sfme::ecs
         }
 
     public:
+        //! Operator
+        Entity &operator[](EntityID id) noexcept
+        {
+            return _entities.at(id);
+        }
+
+        const Entity &operator[](EntityID id) const noexcept
+        {
+            return _entities.at(id);
+        }
+
+    public:
+        //! Reflection
         reflect_class(EntityManager)
 
         static constexpr auto reflectedMembers() noexcept
@@ -136,6 +137,7 @@ namespace sfme::ecs
         }
 
     private:
+        //! Private members
         std::unordered_map<EntityID, Entity> _entities;
         AllocatorsTuple _allocators;
     };

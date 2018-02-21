@@ -12,8 +12,6 @@ end
 
 function testCreateEntity()
     local id = entityManager:createEntity()
-    --print("TEST " .. entityManager:nbEntities())
-    --entityManager:createEntity()
     return id
 end
 

@@ -22,7 +22,8 @@ namespace sfme::mediator::details
     class EventCallbackWrapper final : public BaseEventCallbackWrapper
     {
     public:
-        explicit EventCallbackWrapper(const std::function<void(const TEvent &)> &callback) noexcept : _callback(callback)
+        explicit EventCallbackWrapper(const std::function<void(const TEvent &)> &callback) noexcept : _callback(
+            callback)
         {
         }
 
