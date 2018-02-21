@@ -25,8 +25,7 @@ namespace sfme::mediator
             _receiversRegistry.insert(std::make_pair(eventTypeID,
                                                      ReceiverData{&baseReceiver,
                                                                   std::make_unique<details::EventCallbackWrapper<TEvent>>(
-                                                                      [&receiver](
-                                                                          const auto &ev) noexcept {
+                                                                      [&receiver](const auto &ev) noexcept {
                                                                           receiver.receive(ev);
                                                                       })}));
         };
