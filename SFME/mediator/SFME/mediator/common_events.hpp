@@ -19,6 +19,16 @@ namespace sfme::mediator::evt
         reflect_class(GameStarted);
     };
 
+    struct GameShutdown : public sfme::mediator::BaseEvent
+    {
+        GameShutdown() noexcept
+        {
+
+        };
+
+        reflect_class(GameShutdown);
+    };
+
     struct KeyPressed : public sfme::mediator::BaseEvent
     {
         explicit KeyPressed(sfme::input::keyboard::TKey _key) noexcept : key(_key)
