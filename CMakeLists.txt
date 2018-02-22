@@ -19,6 +19,7 @@ include(${CMAKE_MODULE_PATH}/library.cmake)
 
 ##! SFME_MODULE_PATH
 set(SFME_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake_config)
+set(SFME_ROOT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 ##! SFME CMake file configuration
 include(${SFME_MODULE_PATH}/${PROJECT_NAME}.cmake)
