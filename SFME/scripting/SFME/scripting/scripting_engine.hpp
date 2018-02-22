@@ -80,6 +80,7 @@ namespace sfme::scripting
             return TScriptingSystem::template executeGlobalFunction<ReturnType>(funcName, std::forward<Args>(args)...);
         }
 #elif defined(USING_MSVC)
+        //TODO: This is a workaround for MSVC 15.6, switch to if constexpr in the future
         template<typename ...Args>
         void executeGlobalFunction(const std::string &funcName, Args&& ...args) noexcept
         {

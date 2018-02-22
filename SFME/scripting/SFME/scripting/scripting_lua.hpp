@@ -22,7 +22,6 @@ namespace sfme::scripting
         reflect_class(LuaSystem)
 
     protected:
-
         LuaSystem(fs::path path = fs::current_path() / fs::path("lua_scripts")) noexcept :
             _directoryScriptPath(std::move(path))
         {
@@ -33,6 +32,7 @@ namespace sfme::scripting
 
         void registerBasicTables() noexcept
         {
+            _log(logging::Debug) << "Register Keyboard Table" << std::endl;
             _state["Keyboard"] = _state.create_table_with(
                 input::keyboard::Key::toString(input::keyboard::Key::A), input::keyboard::Key::A,
                 input::keyboard::Key::toString(input::keyboard::Key::B), input::keyboard::Key::B,
@@ -174,8 +174,7 @@ namespace sfme::scripting
                     return self.getEntitiesWithComponents(component, component2, component3, component4);
                 },
                 [](EntityManager &self, const std::string &component, const std::string &component2,
-                   const std::string &component3,
-                   const std::string &component4, const std::string &component5) {
+                   const std::string &component3, const std::string &component4, const std::string &component5) {
                     return self.getEntitiesWithComponents(component, component2, component3, component4, component5);
                 });
             using namespace std::string_literals;
@@ -281,8 +280,7 @@ namespace sfme::scripting
             }
         }
 #elif defined(USING_MSVC)
-
-        //TODO: This is a workaround for MSVC 15.6, switch to if constexpr in the future
+        //Bug: This is a workaround for MSVC 15.6, switch to if constexpr in the future
         template <typename ...Args>
         void executeGlobalFunction(const std::string &funcName, Args &&...args)
         {
@@ -297,6 +295,7 @@ namespace sfme::scripting
 
 #endif
 
+        // ReSharper disable CppNotAllPathsReturnValue
         template <typename ReturnType = void, typename ...Args>
         ReturnType executeScopedFunction(const std::string &scopName, const std::string &funcName, Args &&...args)
         {

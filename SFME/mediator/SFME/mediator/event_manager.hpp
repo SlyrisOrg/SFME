@@ -19,7 +19,7 @@ namespace sfme::mediator
         template <typename TEvent, typename TReceiver>
         void subscribe(TReceiver &receiver) noexcept
         {
-            static_assert(details::is_mediator_event<TEvent>, "The template parameter must be base of BaseEvent");
+            static_assert(details::is_mediator_event<TEvent>, "The template parameter must be derived from BaseEvent");
             const details::EventTypeID eventTypeID = details::getEventTypeID<TEvent>();
             const BaseReceiver &baseReceiver = receiver;
             _receiversRegistry.insert(std::make_pair(eventTypeID,
@@ -33,7 +33,7 @@ namespace sfme::mediator
         template <typename TEvent, typename ... Args>
         void emit(Args &&... args) noexcept
         {
-            static_assert(details::is_mediator_event<TEvent>, "The template parameter must be base of BaseEvent");
+            static_assert(details::is_mediator_event<TEvent>, "The template parameter must be derived from BaseEvent");
             TEvent event(std::forward<Args>(args)...);
             const details::EventTypeID eventTypeID = details::getEventTypeID<TEvent>();
             auto &&receivers = _receiversRegistry.equal_range(eventTypeID);
