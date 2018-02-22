@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <SFME/mediator/base_event.hpp>
 #include <core/reflection/Reflection.hpp>
+#include <SFME/input/input.hpp>
+#include <SFME/mediator/base_event.hpp>
 
 namespace sfme::mediator::evt
 {
@@ -16,5 +17,27 @@ namespace sfme::mediator::evt
         };
 
         reflect_class(GameStarted);
+    };
+
+    struct KeyPressed : public sfme::mediator::BaseEvent
+    {
+        explicit KeyPressed(sfme::input::keyboard::TKey _key) noexcept : key(_key)
+        {
+            showEvents(KeyPressed::className());
+        }
+
+        reflect_class(KeyPressed);
+
+        static constexpr auto reflectedFunctions() noexcept
+        {
+            return meta::makeMap();
+        }
+
+        static constexpr auto reflectedMembers() noexcept
+        {
+            return meta::makeMap(reflect_member(&KeyPressed::key));
+        }
+
+        sfme::input::keyboard::TKey key;
     };
 }

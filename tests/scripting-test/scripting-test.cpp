@@ -59,4 +59,10 @@ namespace sfme::example
         ScriptingSystem &scriptSystem = _sysMgr.getSystem<ScriptingSystem>();
         scriptSystem.executeGlobalFunction("testGetEntityWithSpecificComponents");
     }
+
+    TEST_F(ScriptingFixture, TestKeyboard)
+    {
+        auto& scriptingSystem = _sysMgr.getSystem<ScriptingSystem>();
+        scriptingSystem.executeGlobalFunction("testKeyboard", sfme::input::keyboard::Key::B);
+    }
 }

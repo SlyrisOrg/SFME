@@ -73,11 +73,25 @@ namespace sfme::scripting
             TScriptingSystem::loadScript(fileName);
         }
 
+#ifdef USING_UNIX
         template<typename ReturnType = void, typename ...Args>
         ReturnType executeGlobalFunction(const std::string &funcName, Args&& ...args) noexcept
         {
             return TScriptingSystem::template executeGlobalFunction<ReturnType>(funcName, std::forward<Args>(args)...);
         }
+#elif defined(USING_MSVC)
+        template<typename ...Args>
+        void executeGlobalFunction(const std::string &funcName, Args&& ...args) noexcept
+        {
+            TScriptingSystem::template executeGlobalFunction(funcName, std::forward<Args>(args)...);
+        }
+
+        template<typename ReturnType, typename ...Args>
+        ReturnType executeGlobalFunction(const std::string &funcName, Args&& ...args) noexcept
+        {
+            return TScriptingSystem::template executeGlobalFunction<ReturnType>(funcName, std::forward<Args>(args)...);
+        }
+#endif
 
         template<typename ReturnType = void, typename ...Args>
         ReturnType executeScopedFunction(const std::string &scopName, const std::string &funcName, Args&& ...args) noexcept

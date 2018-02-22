@@ -56,6 +56,10 @@ function testClearEntities()
     end
 end 
 
+function testKeyboard(Key)
+    assert(Key == Keyboard.B, "Wrong Key")
+end
+
 testTable = {
     onUpdate = __update__
 }

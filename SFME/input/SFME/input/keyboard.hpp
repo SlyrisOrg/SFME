@@ -107,4 +107,6 @@ namespace sfme::input::keyboard
 			F15,          ///< The F15 key
 			Pause       ///< The Pause key
 				);
+
+    using TKey = Key::EnumType;
 }
