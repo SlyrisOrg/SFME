@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <core/meta/List.hpp>
 #include <core/reflection/Reflection.hpp>
 #include <SFME/input/input.hpp>
 #include <SFME/mediator/base_event.hpp>

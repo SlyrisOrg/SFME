@@ -1,3 +1,6 @@
 #add_subdirectory(timestep)
 add_subdirectory(mediator)
 add_subdirectory(ecs)
+if (SFME_BUILD_SFML_EXAMPLES)
+    add_subdirectory(sfml)
+endif()
