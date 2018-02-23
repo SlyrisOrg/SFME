@@ -45,7 +45,7 @@ namespace sfme::mediator
         bool isRegister(const BaseReceiver &receiver) const noexcept
         {
             return std::any_of(begin(_receiversRegistry), end(_receiversRegistry),
-                               [&receiver](auto const &receiverEntry) {
+                               [&receiver](const auto &receiverEntry) {
                                    return receiverEntry.second.receiver == &receiver;
                                });
         }
