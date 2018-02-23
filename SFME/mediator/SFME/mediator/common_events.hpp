@@ -50,4 +50,28 @@ namespace sfme::mediator::evt
 
         sfme::input::keyboard::TKey key;
     };
+
+    struct KeyRelease : public sfme::mediator::BaseEvent
+    {
+        explicit KeyRelease(sfme::input::keyboard::TKey _key) noexcept : key(_key)
+        {
+            showEvents(KeyRelease::className());
+        }
+
+        reflect_class(KeyRelease);
+
+        static constexpr auto reflectedFunctions() noexcept
+        {
+            return meta::makeMap();
+        }
+
+        static constexpr auto reflectedMembers() noexcept
+        {
+            return meta::makeMap(reflect_member(&KeyRelease::key));
+        }
+
+        sfme::input::keyboard::TKey key;
+    };
+
+    using CommonEvents = meta::TypeList<GameStarted, GameShutdown, KeyPressed, KeyRelease>;
 }

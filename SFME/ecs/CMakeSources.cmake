@@ -10,6 +10,7 @@ set(MODULE_PUBLIC_HEADERS
         "${MODULE_PATH}/system_base.hpp"
         "${MODULE_PATH}/system_type.hpp"
         "${MODULE_PATH}/system.hpp"
+        "${MODULE_PATH}/common_components.hpp"
         )
 
 set(MODULE_PRIVATE_HEADERS
