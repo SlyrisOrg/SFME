@@ -15,6 +15,7 @@ namespace sfme::mediator::evt
     {
         GameStarted() noexcept
         {
+            showEvents(GameStarted::className());
         };
 
         reflect_class(GameStarted);
@@ -24,7 +25,7 @@ namespace sfme::mediator::evt
     {
         GameShutdown() noexcept
         {
-
+            showEvents(GameShutdown::className());
         };
 
         reflect_class(GameShutdown);

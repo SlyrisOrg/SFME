@@ -1,7 +1,7 @@
 set(SOURCES main.cpp)
 
 add_executable(sfme_sfml_example ${SOURCES})
-target_link_libraries(sfme_sfml_example SFME::SFML SFME::World SFME::ECS SFME::Scripting)
+target_link_libraries(sfme_sfml_example SFME::SFML SFME::World SFME::ECS SFME::Scripting SFME::ResourceManager)
 
 set_target_properties(sfme_sfml_example
         PROPERTIES
@@ -18,4 +18,8 @@ set_target_properties(sfme_sfml_example
 
 if (MSVC)
     target_compile_options(sfme_sfml_example PUBLIC /bigobj)
+endif()
+
+if (CLANG OR GCC)
+    target_compile_options(sfme_sfml_example PUBLIC -ftime-report)
 endif()

@@ -7,6 +7,7 @@ set(MODULE_PUBLIC_HEADERS
         "${MODULE_PATH}/systems/graphical.hpp"
         "${MODULE_PATH}/systems/event.hpp"
         "${MODULE_PATH}/systems.hpp"
+        "${MODULE_PATH}/resource_manager.hpp"
         "${MODULE_PATH}/components.hpp"
         "${MODULE_PATH}/components/drawable.hpp"
         "${MODULE_PATH}/sfml.hpp"

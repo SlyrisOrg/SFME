@@ -22,12 +22,9 @@ namespace sfme::mediator
             static_assert(details::is_mediator_event<TEvent>, "The template parameter must be derived from BaseEvent");
             const details::EventTypeID eventTypeID = details::getEventTypeID<TEvent>();
             const BaseReceiver &baseReceiver = receiver;
-            _receiversRegistry.insert(std::make_pair(eventTypeID,
-                                                     ReceiverData{&baseReceiver,
-                                                                  std::make_unique<details::EventCallbackWrapper<TEvent>>(
-                                                                      [&receiver](const auto &ev) noexcept {
-                                                                          receiver.receive(ev);
-                                                                      })}));
+            auto receiverFunctor = [&receiver](const auto &ev) noexcept { receiver.receive(ev); };
+            auto callbackPtr = std::make_unique<details::EventCallbackWrapper<TEvent>>(receiverFunctor);
+            _receiversRegistry.emplace(eventTypeID, ReceiverData{&baseReceiver, std::move(callbackPtr)});
         };
 
         template <typename TEvent, typename ... Args>
@@ -38,7 +35,7 @@ namespace sfme::mediator
             const details::EventTypeID eventTypeID = details::getEventTypeID<TEvent>();
             auto &&receivers = _receiversRegistry.equal_range(eventTypeID);
             std::for_each(receivers.first, receivers.second, [&event](const auto &receiverEntry) noexcept {
-                receiverEntry.second.callback->operator()(&event);
+                (*receiverEntry.second.callback)(&event);
             });
         };
 
