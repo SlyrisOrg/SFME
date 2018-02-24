@@ -19,38 +19,29 @@ namespace sfme::resource
         using TTexture = typename TResourceManager::TTexture;
 
     public:
-#define noexcept_if(x)  noexcept(noexcept(x))
-
-        TMusic &
-        loadMusic(fs::path filename) noexcept_if(TResourceManager::loadMusic(std::declval<fs::path>()))
+        TMusic &loadMusic(fs::path filename)
         {
             return TResourceManager::loadMusic(std::move(filename));
         }
 
-        TTexture &
-        loadTexture(fs::path filename) noexcept_if(TResourceManager::loadTexture(std::declval<fs::path>()))
+        TTexture &loadTexture(fs::path filename)
         {
             return TResourceManager::loadTexture(std::move(filename));
         }
 
-        void unloadMusic(const ResourceIdentifier &id) noexcept_if(
-            TResourceManager::unloadMusic(std::declval<const ResourceIdentifier>()))
+        void unloadMusic(const ResourceIdentifier &id)
         {
             TResourceManager::unloadMusic(id);
         }
 
-        void unloadTexture(const ResourceIdentifier &id) noexcept_if(
-            TResourceManager::unloadTexture(std::declval<const ResourceIdentifier>()))
+        void unloadTexture(const ResourceIdentifier &id)
         {
             TResourceManager::unloadTexture(id);
         }
 
-        TMusic &getMusic(const ResourceIdentifier &id) noexcept_if(
-            TResourceManager::getMusic(std::declval<const ResourceIdentifier>()))
+        TMusic &getMusic(const ResourceIdentifier &id)
         {
             return TResourceManager::getMusic(id);
         }
-
-#undef noexcept_if
     };
 }
