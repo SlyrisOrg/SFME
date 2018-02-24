@@ -22,13 +22,13 @@ namespace sfme::resource
 #define noexcept_if(x)  noexcept(noexcept(x))
 
         TMusic &
-        loadMusic(fs::path filename) noexcept_if(TResourceManager::loadMusic(std::move(std::declval<fs::path>())))
+        loadMusic(fs::path filename) noexcept_if(TResourceManager::loadMusic(std::declval<fs::path>()))
         {
             return TResourceManager::loadMusic(std::move(filename));
         }
 
         TTexture &
-        loadTexture(fs::path filename) noexcept_if(TResourceManager::loadTexture(std::move(std::declval<fs::path>())))
+        loadTexture(fs::path filename) noexcept_if(TResourceManager::loadTexture(std::declval<fs::path>()))
         {
             return TResourceManager::loadTexture(std::move(filename));
         }
