@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <vector>
+#include <string>
 #include <memory>
 #include <type_traits>
 #include <core/meta/TupleForEach.hpp>

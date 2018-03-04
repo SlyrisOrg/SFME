@@ -13,5 +13,5 @@ if (LINUX)
 endif(LINUX)
 
 if(APPLE)
-    target_link_libraries(SFME-Scripting INTERFACE /usr/local/lib/libc++experimental.a)
+    target_link_libraries(SFME-Scripting INTERFACE /usr/local/opt/llvm/lib/libc++experimental.a)
 endif(APPLE)
