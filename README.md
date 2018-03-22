@@ -32,6 +32,7 @@ See repository's wiki for more info
 [SFME's wiki](https://github.com/Milerius/SFME/wiki)
 
 ## Getting Started (SFML)
+This snippet of code will allow you to have a basic window and start your project.
 
 ```cpp
 //
