@@ -47,6 +47,7 @@ This snippet of code will allow you to have a basic window and start your projec
 #include <SFME/sfml/resource_manager.hpp>
 #include <SFME/resource_manager/base_resource_manager.hpp>
 
+//! Game type traits
 namespace
 {
     using Components = meta::list::Concat<sfme::ecs::components::CommonComponents, sfme::sfml::components::CommonComponents>;
@@ -60,6 +61,7 @@ namespace
     using ResourceManager = sfme::resource::ResourceManager<sfme::sfml::ResourceManager, std::string>;
 }
 
+//! Our game world.
 class World : public sfme::World<GameTraits>, public sfme::mediator::Receiver<World>
 {
 public:
@@ -76,6 +78,7 @@ public:
     {
         _running = true;
         _evtMgr.emit<sfme::mediator::evt::GameStarted>();
+        //! Main game loop, running each systems, we take care of the deltaTime for you
         while (_running) {
             _sysMgr.update();
         }
