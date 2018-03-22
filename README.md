@@ -1,9 +1,7 @@
 # SFME
 Simple and Fast Multimedia Engine
 
-build with SFML and love
-
-
+Built with SFML and love.
 
 ## Table of contents
 
@@ -14,20 +12,19 @@ build with SFML and love
 
 ## Description<a name="description"></a>
 
-SFME (Simple and Fast Multimedia Engine) is an engine divided into several modules which not necessarily depend on each other
+SFME (Simple and Fast Multimedia Engine) is an engine divided into several modules which do not necessarily depend on each other.
  
-Therefore, you can use the whole engine or only one module, it just depends on your needs
-
+Therefore, you can use the whole engine or only one module, it just depends on your needs.
 
 
 ## Installation<a name="install"></a>
 
 ```git clone git@github.com:Milerius/SFME.git```
- 
+
 
 ## Documentation<a name="doc"></a>
 
-See repository's wiki for more info
+See this repository's wiki for more info
 
 [SFME's wiki](https://github.com/Milerius/SFME/wiki)
 
@@ -51,7 +48,11 @@ This snippet of code will allow you to have a basic window and start your projec
 namespace
 {
     using Components = meta::list::Concat<sfme::ecs::components::CommonComponents, sfme::sfml::components::CommonComponents>;
+
+    //We configure our game using the selected components and a scripting language.
     using GameTraits = sfme::world::Traits<Components, sfme::scripting::LuaSystem>;
+
+    //A few aliases for convenience
     using EntityManager = GameTraits::TEntityManager;
     using Entity = GameTraits::TEntity;
     using ScriptingSystem = sfme::scripting::ScriptedSystem<GameTraits>;
@@ -67,6 +68,7 @@ class World : public sfme::World<GameTraits>, public sfme::mediator::Receiver<Wo
 public:
     World()
     {
+        //We subscribe to the events we want to handle
         _evtMgr.subscribe<sfme::mediator::evt::GameShutdown>(*this);
         _evtMgr.subscribe<sfme::mediator::evt::KeyPressed>(*this);
         auto &window = _sysMgr.createSystem<GraphicalSystem>().getWindow();
@@ -104,6 +106,7 @@ private:
 int main()
 {
     World world;
+
     world.run();
     return 0;
 }
